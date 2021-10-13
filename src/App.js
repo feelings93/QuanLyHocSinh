@@ -9,6 +9,8 @@ import Classes from "./pages/Classes";
 import Courses from "./pages/Courses";
 import Transcript from "./pages/Transcript";
 import Statistic from "./pages/Statistic";
+import DateAdapter from "@mui/lab/AdapterMoment";
+import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 const theme = createTheme({
   palette: {
@@ -29,42 +31,45 @@ const theme = createTheme({
         },
       ],
     },
+    // MuiTextField: {},
   },
 });
 function App() {
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ display: "flex" }}>
-        <SideBar />
-        <Box sx={{ flex: "1" }}>
-          <Header />
-          <main>
-            <Switch>
-              <Route exact path="/">
-                <Redirect to="/home"></Redirect>
-              </Route>
-              <Route exact path="/home">
-                <Home />
-              </Route>
-              <Route exact path="/students">
-                <Students />
-              </Route>
-              <Route exact path="/classes">
-                <Classes />
-              </Route>
-              <Route exact path="/courses">
-                <Courses />
-              </Route>
-              <Route exact path="/transcript">
-                <Transcript />
-              </Route>
-              <Route exact path="/statistic">
-                <Statistic />
-              </Route>
-            </Switch>
-          </main>
+      <LocalizationProvider dateAdapter={DateAdapter}>
+        <Box sx={{ display: "flex" }}>
+          <SideBar />
+          <Box sx={{ flex: "1" }}>
+            <Header />
+            <main>
+              <Switch>
+                <Route exact path="/">
+                  <Redirect to="/home"></Redirect>
+                </Route>
+                <Route exact path="/home">
+                  <Home />
+                </Route>
+                <Route path="/students">
+                  <Students />
+                </Route>
+                <Route exact path="/classes">
+                  <Classes />
+                </Route>
+                <Route exact path="/courses">
+                  <Courses />
+                </Route>
+                <Route exact path="/transcript">
+                  <Transcript />
+                </Route>
+                <Route exact path="/statistic">
+                  <Statistic />
+                </Route>
+              </Switch>
+            </main>
+          </Box>
         </Box>
-      </Box>
+      </LocalizationProvider>
     </ThemeProvider>
   );
 }

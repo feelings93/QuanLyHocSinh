@@ -8,16 +8,17 @@ import React, { useEffect } from "react";
 import useHttp from "../../hooks/use-http";
 import { getAllStudents } from "../../lib/api";
 import StudentsTable from "./StudentsTable";
-import { useHistory } from "react-router-dom";
+import { useHistory, useRouteMatch } from "react-router-dom";
 
 const StudentsList = () => {
   const { sendRequest, status, data, error } = useHttp(getAllStudents, true);
   const history = useHistory();
+  const { url } = useRouteMatch();
   useEffect(() => {
     sendRequest();
   }, [sendRequest]);
   const addStudentHandler = () => {
-    history.push("/students/add");
+    history.push(url + "/add");
   };
   if (status === "pending") {
     return (
