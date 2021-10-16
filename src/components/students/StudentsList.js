@@ -71,7 +71,7 @@ const StudentsList = () => {
           boxShadow: "0px 0px  30px 5px rgba(0, 0, 0, 0.08)",
         }}
       >
-        <Grid xs={12}>
+        <Grid item xs={12}>
           <StudentsTable data={data} />
         </Grid>
       </Grid>

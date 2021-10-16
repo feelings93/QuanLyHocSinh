@@ -3,7 +3,7 @@ import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Typography from "@mui/material/Typography";
 import Link from "@mui/material/Link";
 import { useHistory } from "react-router-dom";
-import AddStudentForm from "./AddStudentForm";
+import AddStudentForm from "../components/students/AddStudentForm";
 const AddStudent = () => {
   const history = useHistory();
   const moveToStudentsHandler = () => {

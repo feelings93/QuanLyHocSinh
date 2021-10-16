@@ -1,38 +1,41 @@
 import React from "react";
-
+import swal from "sweetalert";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import FormControl from "@mui/material/FormControl";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import useHttp from "../../hooks/use-http";
-import { addStudent } from "../../lib/api";
+
 import InputLabel from "@mui/material/InputLabel";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
-
+// import useHttp from "../../hooks/use-http";
+// import { addStudent } from "../../lib/api";
 import DatePicker from "@mui/lab/DatePicker";
 import { useForm, Controller } from "react-hook-form";
-const AddStudentForm = () => {
-  const { sendRequest, status } = useHttp(addStudent);
+const EditStudentForm = (props) => {
+  const { student } = props;
   const { control, handleSubmit } = useForm();
+  // const { sendRequest, status, error } = useHttp(addStudent);
   const submitFormHandler = (data) => {
-    sendRequest(data);
+    swal({
+      text: "Hello world!",
+    });
+    console.log(data);
+    // sendRequest(data);
   };
   return (
     <Paper elevation={4} sx={{ padding: "16px" }}>
       <Typography mb="16px" variant="h6" sx={{ fontSize: "18px" }}>
-        Thêm học sinh
+        Cập nhật thông tin học sinh
       </Typography>
       <form onSubmit={handleSubmit(submitFormHandler)}>
-        <InputLabel mb="8px" htmlFor="name-input">
-          Họ và tên
-        </InputLabel>
+        <InputLabel htmlFor="name-input">Họ và tên</InputLabel>
         <Controller
-          name="hoTen"
+          name="fullName"
           control={control}
-          defaultValue=""
+          defaultValue={student.hoTen}
           render={({ field }) => (
             <TextField
               {...field}
@@ -43,16 +46,16 @@ const AddStudentForm = () => {
           )}
         ></Controller>
 
-        <InputLabel mb="8px">Giới tính</InputLabel>
+        <InputLabel>Giới tính</InputLabel>
         <Controller
-          name="gioiTinh"
+          name="gender"
           control={control}
-          defaultValue="Nam"
+          defaultValue={student.gioiTinh}
           render={({ field }) => (
             <FormControl {...field} component="fieldset">
               <RadioGroup
                 aria-label="gender"
-                defaultValue="Nam"
+                defaultValue={student.gioiTinh}
                 name="radio-buttons-group"
               >
                 <FormControlLabel value="Nam" control={<Radio />} label="Nam" />
@@ -64,17 +67,19 @@ const AddStudentForm = () => {
         <InputLabel>Ngày sinh</InputLabel>
 
         <Controller
-          name="ngaySinh"
+          name="birthday"
           control={control}
-          defaultValue=""
-          render={({ field }) => <BasicDatePicker {...field} />}
+          defaultValue="23/11/2020"
+          render={({ field }) => (
+            <BasicDatePicker initVal={student.ngaySinh} {...field} />
+          )}
         ></Controller>
 
         <InputLabel htmlFor="address-input">Địa chỉ</InputLabel>
         <Controller
-          name="diaChi"
+          name="address"
           control={control}
-          defaultValue=""
+          defaultValue={student.diaChi}
           render={({ field }) => (
             <TextField
               {...field}
@@ -86,20 +91,19 @@ const AddStudentForm = () => {
         ></Controller>
 
         <Button
-          disabled={status === "pending"}
           color="success"
           sx={{ marginTop: "16px" }}
           type="submit"
           variant="contained"
         >
-          {status === "pending" ? "Đang thêm..." : "Thêm"}
+          Cập nhật
         </Button>
       </form>
     </Paper>
   );
 };
 const BasicDatePicker = React.forwardRef((props, ref) => {
-  const [value, setValue] = React.useState(null);
+  const [value, setValue] = React.useState(props.ngaySinh);
   const setNewValueHandler = (newValue) => {
     props.onChange(newValue.format("DD/MM/yyyy"));
     setValue(newValue);
@@ -113,4 +117,4 @@ const BasicDatePicker = React.forwardRef((props, ref) => {
     />
   );
 });
-export default AddStudentForm;
+export default EditStudentForm;
