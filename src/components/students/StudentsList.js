@@ -57,7 +57,7 @@ const StudentsList = () => {
           alignItems: "center",
         }}
       >
-        <Typography variant="h4" component="h2">
+        <Typography variant="h4" component="h2" sx={{ fontWeight: 700 }}>
           Danh sách học sinh
         </Typography>
         <Button onClick={addStudentHandler} variant="contained" color="success">

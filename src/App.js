@@ -52,7 +52,7 @@ const theme = createTheme(
             marginBottom: "8px",
           },
           input: {
-            padding: "8px 14px",
+            // padding: "8px 14px",
             border: "",
           },
         },
@@ -60,7 +60,7 @@ const theme = createTheme(
       MuiInputLabel: {
         styleOverrides: {
           root: {
-            margin: "8px 0 4px",
+            // margin: "8px 0 4px",
             fontWeight: 500,
             fontSize: "14px",
           },
@@ -113,7 +113,7 @@ function App() {
                   <Route path="/students">
                     <Students />
                   </Route>
-                  <Route exact path="/classes">
+                  <Route path="/classes">
                     <Classes />
                   </Route>
                   <Route exact path="/courses">
