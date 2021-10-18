@@ -34,6 +34,7 @@ const Header = () => {
             <Typography variant="subtitle1" color="inherit" component="div">
               Hi, Cuong
             </Typography>
+
           </Box>
         </Toolbar>
       </AppBar>
