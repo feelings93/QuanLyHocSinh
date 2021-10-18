@@ -9,7 +9,7 @@ const TabItem = (props) => {
         className={classes["tab-item"]}
         to={props.link}
       >
-        <span class="material-icons">{props.icon}</span> {props.title}
+        <span className="material-icons">{props.icon}</span> {props.title}
       </NavLink>
     </li>
   );
