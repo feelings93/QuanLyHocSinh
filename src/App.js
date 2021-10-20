@@ -9,6 +9,7 @@ import DateAdapter from "@mui/lab/AdapterMoment";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { viVN } from "@mui/material/locale";
+import Users from "./pages/Users";
 const Home = React.lazy(() => import("./pages/Home"));
 const Students = React.lazy(() => import("./pages/Students"));
 const Classes = React.lazy(() => import("./pages/Classes"));
@@ -45,17 +46,6 @@ const theme = createTheme(
             },
           },
         ],
-      },
-      MuiOutlinedInput: {
-        styleOverrides: {
-          root: {
-            marginBottom: "8px",
-          },
-          input: {
-            // padding: "8px 14px",
-            border: "",
-          },
-        },
       },
       MuiInputLabel: {
         styleOverrides: {
@@ -124,6 +114,9 @@ function App() {
                   </Route>
                   <Route exact path="/statistic">
                     <Statistic />
+                  </Route>
+                  <Route exact path="/users">
+                    <Users />
                   </Route>
                 </Switch>
               </Suspense>

@@ -6,7 +6,6 @@ import EditClass from "./EditClass";
 
 const Classes = () => {
   let { path } = useRouteMatch();
-  console.log(`${path}/add`);
   return (
     <Box
       sx={{ padding: "32px", width: "100%", minHeight: "calc(100vh - 48px)" }}
