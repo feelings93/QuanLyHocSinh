@@ -14,8 +14,8 @@ const Age =(props)=> {
         setMinAge(e.target.value);
     }
     return (
-        <Grid container  sm={12} xs={8} justifyContent="space-between" padding="0 70px 0 70px" alignItems="center">
-            <Grid sm={8} xs={4}>
+        <Grid container  sm={12} xs={12} justifyContent="space-between" padding="0 70px 0 70px" alignItems="center">
+            <Grid sm={8} xs={8}>
                 <Typography  variant="h6" gutterBottom component="div">
                     Độ tuổi học sinh tối đa:
                 </Typography>
@@ -33,7 +33,7 @@ const Age =(props)=> {
                     }}
                 />
             </Grid>
-            <Grid sm={8} xs={4}>
+            <Grid sm={8} xs={8}>
                 <Typography  variant="h6" gutterBottom component="div">
                     Độ tuổi học sinh tối thiểu:
                 </Typography>

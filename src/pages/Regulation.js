@@ -69,8 +69,8 @@ const Regulation = () => {
 
 
   return (
-  <Grid container  sm={12} alignItems="center" justifyContent="center"   direction="column" marginTop="10px"  >
-    <Grid sm={12} display="flex" justifyContent="space-between" >
+  <Grid container  sm={12} xs={12} alignItems="center" justifyContent="center"   direction="column" marginTop="20px"  >
+    <Grid sm={12} xs={12} display="flex" justifyContent="space-between" >
       <h1>Thay đổi qui định</h1>    
       <Box>
       <IconButton aria-label="edit"  color="primary" disabled={edit} onClick={()=>{ setEdit(true)}} >
@@ -78,9 +78,9 @@ const Regulation = () => {
       </IconButton> 
       </Box>
     </Grid>
-    <Grid sm={12}>
+    <Grid sm={12} xs={12}>
     <TabContext value={value}  >
-        <Box sx={{ minWidth:'400px', width:"700px",borderRadius:4, borderColor: 'divider' , boxShadow:3,padding:'0 10px 0 10px'}}>
+        <Box sx={{ minWidth:'420px', maxWidth:"700px",borderRadius:4, borderColor: 'divider' , boxShadow:3,padding:'0 10px 0 10px'}}>
             <TabList  TabList onChange={handleChange} aria-label="lab API tabs example" centered variant="fullWidth">
                 <Tab style={{fontSize:"18px"}} label="Số lượng" value="qua" />
                 <Tab style={{fontSize:"18px"}} label="Xếp loại" value="rank" />
@@ -89,6 +89,7 @@ const Regulation = () => {
         </Box>
         <TabPanel  value="qua" >
           <Box
+          minWidth='440px'
           padding="25px 0 10px 0" 
           maxWidth="650px"
           sx={{
@@ -111,6 +112,7 @@ const Regulation = () => {
         </TabPanel>
         <TabPanel value="rank">
           <Box
+          minWidth='440px'
           padding="15px 0 5px 0" 
           maxWidth="650px"
           sx={{
@@ -130,6 +132,8 @@ const Regulation = () => {
         </TabPanel>
         <TabPanel  value="age">
         <Box
+                  minWidth='440px'
+
           padding="15px 0 5px 0" 
           maxWidth="650px"
           sx={{
@@ -151,7 +155,7 @@ const Regulation = () => {
         </TabPanel>
     </TabContext>
     </Grid>
-    <Grid>
+    <Grid sm={12} xs={8}>
     <Button style={{ display: edit ? "" : "none" }} variant="contained" size="Large" endIcon={<SaveIcon />} disabled={!edit} onClick={()=>{setEdit(!edit)}} >
         Lưu lại
       </Button>
