@@ -41,7 +41,7 @@ import { MoreVert } from "@mui/icons-material";
 // ];
 const columns = [
   { field: "malop", headerName: "Mã lớp", width: 100 },
-  { field: "lop", headerName: "Lớp", width: 120 },
+  { field: "lop", headerName: "Lớp", width: 80 },
   { field: "sohsdat", headerName: "Học sinh đạt", width: 120 },
 
 ];

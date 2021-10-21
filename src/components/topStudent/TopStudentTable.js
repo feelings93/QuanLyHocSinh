@@ -40,7 +40,7 @@ import { CenterFocusStrong, MoreVert } from "@mui/icons-material";
 //   },
 // ];
 const columns = [
-  { field: "id", headerName: "Mã HS", width: 150, },
+  { field: "id", headerName: "Mã HS", width: 120, },
   { field: "hoTen", headerName: "Họ tên", width: 200 },
   { field: "lop", headerName: "Lớp", width: 80 },
   { field: "diaChi", headerName: "Địa chỉ", width: 250 },
@@ -50,9 +50,10 @@ const columns = [
 
 const TopStudentTable = (props) => {
   return (
-    <div style={{ height: "500px", width: "100%",textAlign:"center" }}>
+    <div style={{ height: "500px", width: "100%"}}>
       <DataGrid 
-        disableColumnMenu        
+        disableColumnMenu    
+        disableSelectionOnClick    
         rows={props.data}
         columns={columns} 
       />
