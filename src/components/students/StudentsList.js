@@ -9,7 +9,9 @@ import useHttp from "../../hooks/use-http";
 import { getAllStudents } from "../../lib/api";
 import StudentsTable from "./StudentsTable";
 import { useHistory, useRouteMatch } from "react-router-dom";
-
+import InputAdornment from "@mui/material/InputAdornment";
+import TextField from "@mui/material/TextField";
+import { Search } from "@mui/icons-material";
 const StudentsList = () => {
   const { sendRequest, status, data, error } = useHttp(getAllStudents, true);
   const history = useHistory();
@@ -60,9 +62,34 @@ const StudentsList = () => {
         <Typography variant="h4" component="h2" sx={{ fontWeight: 700 }}>
           Danh sách học sinh
         </Typography>
-        <Button onClick={addStudentHandler} variant="contained" color="success">
-          Thêm
-        </Button>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <TextField
+            id="search"
+            label="Tìm kiếm"
+            variant="outlined"
+            size="small"
+            sx={{ marginRight: "8px" }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <Button
+            onClick={addStudentHandler}
+            variant="contained"
+            color="success"
+          >
+            Thêm
+          </Button>
+        </Box>
       </Box>
 
       <Grid

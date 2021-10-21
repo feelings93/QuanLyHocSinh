@@ -64,7 +64,7 @@ const TopClassList = () => {
           boxShadow: "0px 0px  30px 5px rgba(0, 0, 0, 0.08)",
         }}
       >
-        <Grid xs={12}>
+        <Grid xs={4}>
           <TopClassTable data={data} />
         </Grid>
       </Grid>
