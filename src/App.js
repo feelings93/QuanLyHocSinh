@@ -15,6 +15,8 @@ const Classes = React.lazy(() => import("./pages/Classes"));
 const Courses = React.lazy(() => import("./pages/Courses"));
 const Transcript = React.lazy(() => import("./pages/Transcript"));
 const Statistic = React.lazy(() => import("./pages/Statistic"));
+const Regulation = React.lazy(() => import("./pages/Regulation"));
+
 
 const theme = createTheme(
   {
@@ -124,6 +126,9 @@ function App() {
                   </Route>
                   <Route exact path="/statistic">
                     <Statistic />
+                  </Route>
+                  <Route exact path="/rules">
+                    <Regulation />
                   </Route>
                 </Switch>
               </Suspense>
