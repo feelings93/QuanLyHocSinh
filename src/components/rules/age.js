@@ -14,13 +14,13 @@ const Age =(props)=> {
         setMinAge(e.target.value);
     }
     return (
-        <Grid container  sm={12} xs={12} justifyContent="space-between" padding="0 70px 0 70px" alignItems="center">
-            <Grid sm={8} xs={8}>
+        <Grid container rowSpacing={1.5}  sm={12} xs={12} justifyContent="space-between" padding="0 70px 5px 70px" alignItems="center">
+            <Grid item sm={8} xs={8}>
                 <Typography  variant="h6" gutterBottom component="div">
                     Độ tuổi học sinh tối đa:
                 </Typography>
             </Grid>
-            <Grid sm={4} xs={4}>
+            <Grid item sm={4} xs={4}>
                 <TextField
                     id="agemax-number"
                     label="Tối đa"
@@ -33,12 +33,12 @@ const Age =(props)=> {
                     }}
                 />
             </Grid>
-            <Grid sm={8} xs={8}>
+            <Grid item sm={8} xs={8}>
                 <Typography  variant="h6" gutterBottom component="div">
                     Độ tuổi học sinh tối thiểu:
                 </Typography>
             </Grid>
-            <Grid sm={4} xs={4}>
+            <Grid item sm={4} xs={4}>
                 <TextField
                     id="agemin-number"
                     label="Tối thiểu"

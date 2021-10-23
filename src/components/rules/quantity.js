@@ -25,14 +25,14 @@ const  Quantity=(props)=> {
       };
 
     return (
-        <Grid container  sm={12} xs={12} justifyContent="space-between" padding="0 70px 0 70px" alignItems="center"  >
-            <Grid sm={8} xs={8}>
+        <Grid container rowSpacing={1.5} sm={12} xs={12} justifyContent="space-between" padding="0 70px 5px 70px" alignItems="center"  >
+            <Grid item sm={8} xs={8}>
                 <Typography  variant="h6" gutterBottom component="div" >
                     Số lớp tối đa:
                 </Typography>
            
             </Grid>
-            <Grid sm={4} xs={4}>
+            <Grid item sm={4} xs={4}>
                 <TextField
                     fullWidth="auto"
                     id="class-number"
@@ -47,7 +47,7 @@ const  Quantity=(props)=> {
                     }}
                 />
             </Grid>
-            <Grid sm={8} xs={8}>                
+            <Grid item sm={8} xs={8}>                
                  
                 <Box   Box display="flex" alignItems="center">
                     <Typography  variant="h6" gutterBottom component="div"  >
@@ -59,7 +59,7 @@ const  Quantity=(props)=> {
                 </Box>                     
             </Grid>
      
-            <Grid sm={2} xs={2}>
+            <Grid item sm={2} xs={2}>
                 <TextField
                     id="peoplemax-number"
                     label="Tối đa"
@@ -72,7 +72,7 @@ const  Quantity=(props)=> {
                     }}
                 />
             </Grid>
-            <Grid sm={2} xs={2}>
+            <Grid item sm={2} xs={2}>
                 <TextField
                     id="peoplemin-number"
                     label="Tối thiểu"
@@ -86,13 +86,13 @@ const  Quantity=(props)=> {
                     }}
                 />
             </Grid>
-            <Grid sm={8} xs={8}>
+            <Grid item sm={8} xs={8}>
                 <Typography  variant="h6" gutterBottom component="div" >
                     Số môn học tối đa:
                 </Typography>
            
             </Grid>
-            <Grid sm={4} xs={4}>
+            <Grid item sm={4} xs={4}>
                 <TextField
                     id="subject-number"
                     label="Môn học"

@@ -69,16 +69,18 @@ const Regulation = () => {
 
 
   return (
-  <Grid container  sm={12} xs={12} alignItems="center" justifyContent="center"   direction="column" marginTop="20px"  >
-    <Grid sm={12} xs={12} display="flex" justifyContent="space-between" >
-      <h1>Thay đổi qui định</h1>    
+  <Grid container  sm={12} xs={12} alignItems="center" justifyContent="center"   direction="column" marginTop="20px"  rowSpacing={1.5}  >
+    <Grid item sm={12} xs={12} display="flex" justifyContent="space-between">
+      <Box marginLeft="35px">
+      <h1> Thay đổi qui định</h1>    
+      </Box>  
       <Box>
       <IconButton aria-label="edit"  color="primary" disabled={edit} onClick={()=>{ setEdit(true)}} >
         <EditIcon />
       </IconButton> 
       </Box>
     </Grid>
-    <Grid sm={12} xs={12}>
+    <Grid item sm={12} xs={12}>
     <TabContext value={value}  >
         <Box sx={{ minWidth:'420px', maxWidth:"700px",borderRadius:4, borderColor: 'divider' , boxShadow:3,padding:'0 10px 0 10px'}}>
             <TabList  TabList onChange={handleChange} aria-label="lab API tabs example" centered variant="fullWidth">
