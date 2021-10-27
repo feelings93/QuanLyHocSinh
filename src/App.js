@@ -107,7 +107,7 @@ function App() {
                   <Route path="/classes">
                     <Classes />
                   </Route>
-                  <Route exact path="/courses">
+                  <Route path="/courses">
                     <Courses />
                   </Route>
                   <Route exact path="/transcript">
