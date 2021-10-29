@@ -8,9 +8,13 @@ const Transcript = () => {
     <Box
       sx={{ padding: "32px", width: "100%", minHeight: "calc(100vh - 48px)" }}
     >      
+      <Switch>
+        <Route exact path={path}>
           <TranscriptList />
+        </Route>
 
 
+      </Switch>
     </Box>
   );
 };
