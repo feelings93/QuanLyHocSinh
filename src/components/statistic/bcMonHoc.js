@@ -4,70 +4,59 @@ import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import React, { useEffect } from "react";
-import TranscriptTable from "./TranscriptTable";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
 import { Search } from "@mui/icons-material";
-import { getAllStudents } from "../../lib/api";
-import useHttp from "../../hooks/use-http";
 import { useHistory } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
-import AddLoaiHinhKT from "./AddLoaiHinhKT";
-const TranscriptList = () => {
-    const [lop, setLop] = React.useState('');
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import { IconButton } from '@mui/material';
+import LocalPrintshopOutlinedIcon from '@mui/icons-material/LocalPrintshopOutlined';
+
+const BCMonHoc =()=> {
+    const columns = [
+        { field: "id", headerName: "ID", width: 100 },
+        { field: "tenLop", headerName: "Lớp", width: 200 },
+        { field: "siSo", headerName: "Sĩ số", width: 200 },
+        { field: "soluongDat", headerName: "Số lượng đạt",  width: 200 },
+        { field: "tileDat", headerName: "Tỉ lệ đạt",  width: 200 },
+        { field: "ghiChu", headerName: "Ghi chú",  width: 200 },
+
+    ];
+       
+    const rows = [
+        { id: 1, tenLop: '10A1', siSo: 40, soluongDat: 35 ,tileDat:'90%'},
+        { id: 2, tenLop: '10A1', siSo: 40, soluongDat: 35 ,tileDat:'90%'},
+        { id: 3, tenLop: '10A1', siSo: 40, soluongDat: 35 ,tileDat:'90%'},
+        { id: 4, tenLop: '10A1', siSo: 40, soluongDat: 35 ,tileDat:'90%'},
+        { id: 5, tenLop: '10A1', siSo: 40, soluongDat: 35 ,tileDat:'90%'},
+        { id: 6, tenLop: '10A1', siSo: 40, soluongDat: 35 ,tileDat:'90%'},
+        { id: 7, tenLop: '10A1', siSo: 40, soluongDat: 35 ,tileDat:'90%'},
+
+      ];
     const [subject, setSubject] = React.useState('');
     const [semester, setSemester] = React.useState('');
+    const [pageSize, setPageSize] = React.useState(15);
 
-    const [isAddLoaiHinhKTDialogVisible, setIsAddLoaiHinhKTDialogVisible] =
-    React.useState(false);
-    const hideAddLoaiHinhKTHandler = () => {
-        setIsAddLoaiHinhKTDialogVisible(false);
-      };
-      const showLoaiHinhKTCourseHandler = () => {
-        setIsAddLoaiHinhKTDialogVisible(true);
-      };
-    const LopHandleChange = (event) => {
-        setLop(event.target.value);
-    };
     const   SubjectHandleChange = (event) => {
         setSubject(event.target.value);
     };
     const SemesterHandleChange = (event) => {
         setSemester(event.target.value);
     };
-  return (
-    <>
-      <Grid container sm={12} rowSpacing={4} >
-        <Grid item sm={12}>
-                <Typography variant="h4" component="h2" sx={{ fontWeight: 700 }}>
-                    Phiếu điểm
-                </Typography>
-            </Grid>
+    return (
+        <Grid container sm={12} rowSpacing={3}>
+            
         <Grid container item sm={1} sx={{ alignItems: 'center' }}>
             <Typography   variant="h6" component="h6" sx={{ fontSize:"17px"  }}>
                     Lựa chọn:
             </Typography>
         </Grid>
         <Grid   item sm={5} >
-            <FormControl size="small" sx={{minWidth:"90px",marginRight:"8px"}}>
-                <InputLabel id="idSelectClass">Lớp*</InputLabel>
-                <Select
-                labelId="selectClass"
-                id="idSelectClass"
-                value={lop}
-                label="Lớp"
-                type="string"
-                onChange={LopHandleChange}
-                >
-                    <MenuItem value={10}>10A1</MenuItem>
-                    <MenuItem value={20}>10A2</MenuItem>
-                    <MenuItem value={30}>10A3</MenuItem>
-                </Select>
-            </FormControl>
             <FormControl size="small" sx={{minWidth:"110px",marginRight:"8px"}}>
                 <InputLabel id="idSelectClass">Môn học*</InputLabel>
                 <Select
@@ -98,53 +87,33 @@ const TranscriptList = () => {
             </FormControl>
         </Grid>
         <Grid container item sm={6} sx={{ justifyContent: 'flex-end' }} >
-        <TextField
-        
-                id="search"
-                label="Tìm kiếm"
-                variant="outlined"
-                size="small"
-                sx={{ marginRight: "6px" }}
-                InputProps={{
-                startAdornment: (
-                    <InputAdornment position="start">
-                    <Search />
-                    </InputAdornment>
-                ),
-                }}
-            />
-            <Button
-            variant="contained"
-            color="success"
-            onClick={showLoaiHinhKTCourseHandler}
-
-            >
-            Thêm
-          </Button>
-        </Grid>    
-        <Box
-            marginTop="10px"
-            width="100%"
-            sm={12}
-            container
-            sx={{
-            boxShadow: "0px 0px  30px 5px rgba(0, 0, 0, 0.08)"
+            <IconButton color="primary" aria-label="add to shopping cart">
+                <LocalPrintshopOutlinedIcon />
+            </IconButton>
+        </Grid>
+        <Grid item sm={12}>
+            <DataGrid
+            components={{
+            Toolbar: GridToolbar,
             }}
-        >    
-            <TranscriptTable ></TranscriptTable>
+            className="mh-500 bt-none"
+            hideFooterSelectedRowCount
+            pageSize={pageSize}
+            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
 
-        </Box>
- 
-        <AddLoaiHinhKT
-        open={isAddLoaiHinhKTDialogVisible}
-        onClose={hideAddLoaiHinhKTHandler}
+            pagination
+            disableColumnMenu
+            disableSelectionOnClick
+            
+             rows={rows}
+            rowsPerPageOptions={[5, 10, 20]}
+            columns={columns}
+          
+         
         />
-      </Grid>
+        </Grid>
+        </Grid>
+    )
+}
 
-
-      
-    </>
-  );
-};
-
-export default TranscriptList;
+export default BCMonHoc
