@@ -1,5 +1,4 @@
 import React from "react";
-import swal from "sweetalert";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import FormControl from "@mui/material/FormControl";
@@ -10,21 +9,21 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import InputLabel from "@mui/material/InputLabel";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
-// import useHttp from "../../hooks/use-http";
-// import { addStudent } from "../../lib/api";
+import useHttp from "../../hooks/use-http";
+import { editStudent } from "../../lib/api";
 import DatePicker from "@mui/lab/DatePicker";
 import { useForm, Controller } from "react-hook-form";
+import moment from "moment";
 const EditStudentForm = (props) => {
   const { student } = props;
   const { control, handleSubmit } = useForm();
-  // const { sendRequest, status, error } = useHttp(addStudent);
+  const { sendRequest, status, error } = useHttp(editStudent);
   const submitFormHandler = (data) => {
-    swal({
-      text: "Hello world!",
-    });
-    console.log(data);
-    // sendRequest(data);
+    let request = { ...student, ...data };
+    console.log(request);
+    sendRequest(request);
   };
+  if (error) alert(error);
   return (
     <Paper elevation={4} sx={{ padding: "16px" }}>
       <Typography mb="16px" variant="h6" sx={{ fontSize: "18px" }}>
@@ -33,7 +32,7 @@ const EditStudentForm = (props) => {
       <form onSubmit={handleSubmit(submitFormHandler)}>
         <InputLabel htmlFor="name-input">Họ và tên</InputLabel>
         <Controller
-          name="fullName"
+          name="hoTen"
           control={control}
           defaultValue={student.hoTen}
           render={({ field }) => (
@@ -48,7 +47,7 @@ const EditStudentForm = (props) => {
 
         <InputLabel>Giới tính</InputLabel>
         <Controller
-          name="gender"
+          name="gioiTinh"
           control={control}
           defaultValue={student.gioiTinh}
           render={({ field }) => (
@@ -67,7 +66,7 @@ const EditStudentForm = (props) => {
         <InputLabel>Ngày sinh</InputLabel>
 
         <Controller
-          name="birthday"
+          name="ngaySinh"
           control={control}
           defaultValue="23/11/2020"
           render={({ field }) => (
@@ -77,7 +76,7 @@ const EditStudentForm = (props) => {
 
         <InputLabel htmlFor="address-input">Địa chỉ</InputLabel>
         <Controller
-          name="address"
+          name="diaChi"
           control={control}
           defaultValue={student.diaChi}
           render={({ field }) => (
@@ -91,20 +90,22 @@ const EditStudentForm = (props) => {
         ></Controller>
 
         <Button
+          disabled={status === "pending"}
           color="success"
           sx={{ marginTop: "16px" }}
           type="submit"
           variant="contained"
         >
-          Cập nhật
+          {status === "pending" ? "Đang cập nhật..." : "Cập nhật"}
         </Button>
       </form>
     </Paper>
   );
 };
 const BasicDatePicker = React.forwardRef((props, ref) => {
-  const [value, setValue] = React.useState(props.ngaySinh);
+  const [value, setValue] = React.useState(moment(props.initVal, "DD/MM/YYYY"));
   const setNewValueHandler = (newValue) => {
+    console.log(newValue);
     props.onChange(newValue.format("DD/MM/yyyy"));
     setValue(newValue);
   };

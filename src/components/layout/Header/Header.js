@@ -6,7 +6,8 @@ import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import MenuIcon from "@mui/icons-material/Menu";
 import Avatar from "@mui/material/Avatar";
-const Header = () => {
+
+const Header = (props) => {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar
@@ -30,11 +31,10 @@ const Header = () => {
               cursor: "pointer",
             }}
           >
-            <Avatar sx={{ mr: "4px" }}>NC</Avatar>
+            <Avatar sx={{ mr: "4px" }}>{props.nameUser[0]}</Avatar>
             <Typography variant="subtitle1" color="inherit" component="div">
-              Hi, Cuong
+              {`Xin chào, ${props.nameUser}`}
             </Typography>
-
           </Box>
         </Toolbar>
       </AppBar>

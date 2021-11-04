@@ -11,7 +11,13 @@ import Box from "@mui/material/Box";
 import Fab from "@mui/material/Fab";
 import { Add } from "@mui/icons-material";
 import AddClassForm from "./AddClassForm";
+import { getAllClasses } from "../../lib/api";
+import useHttp from "../../hooks/use-http";
 const ClassList = (props) => {
+  const { sendRequest, status, data, error } = useHttp(getAllClasses, true);
+  React.useEffect(() => {
+    sendRequest();
+  }, [sendRequest]);
   const [grade, setGrade] = React.useState(10);
   const [isAddClassDialogVisible, setIsAddClassDialogVisible] =
     React.useState(false);
@@ -24,7 +30,9 @@ const ClassList = (props) => {
   const hideAddClassHandler = () => {
     setIsAddClassDialogVisible(false);
   };
-  const filteredClasses = DUMMY_CLASS.filter((e) => e.khoi === grade);
+  if (status === "pending") return <h4>Đang tải...</h4>;
+  if (error) return <h4>Đã có lỗi xảy ra</h4>;
+  const filteredClasses = data.filter((e) => e.maKhoi === grade - 9);
   return (
     <>
       <Breadcrumbs mb="16px" aria-label="breadcrumb">
@@ -75,168 +83,4 @@ const ClassList = (props) => {
     </>
   );
 };
-const DUMMY_CLASS = [
-  {
-    id: 1,
-    khoi: 10,
-    tenLop: "10A1",
-    siSo: 40,
-  },
-  {
-    id: 2,
-    khoi: 10,
-    tenLop: "10A2",
-    siSo: 36,
-  },
-  {
-    id: 3,
-    khoi: 10,
-    tenLop: "10A3",
-    siSo: 38,
-  },
-  {
-    id: 4,
-    khoi: 10,
-    tenLop: "10A4",
-    siSo: 40,
-  },
-  {
-    id: 5,
-    khoi: 10,
-    tenLop: "10A5",
-    siSo: 36,
-  },
-  {
-    id: 6,
-    khoi: 10,
-    tenLop: "10A6",
-    siSo: 38,
-  },
-  {
-    id: 7,
-    khoi: 10,
-    tenLop: "10A7",
-    siSo: 40,
-  },
-  {
-    id: 8,
-    khoi: 10,
-    tenLop: "10A8",
-    siSo: 36,
-  },
-  {
-    id: 9,
-    khoi: 10,
-    tenLop: "10A9",
-    siSo: 38,
-  },
-  {
-    id: 10,
-    khoi: 11,
-    tenLop: "11A1",
-    siSo: 40,
-  },
-  {
-    id: 11,
-    khoi: 11,
-    tenLop: "11A2",
-    siSo: 36,
-  },
-  {
-    id: 12,
-    khoi: 11,
-    tenLop: "11A3",
-    siSo: 38,
-  },
-  {
-    id: 13,
-    khoi: 11,
-    tenLop: "11A4",
-    siSo: 40,
-  },
-  {
-    id: 14,
-    khoi: 11,
-    tenLop: "11A5",
-    siSo: 36,
-  },
-  {
-    id: 15,
-    khoi: 11,
-    tenLop: "11A6",
-    siSo: 38,
-  },
-  {
-    id: 16,
-    khoi: 11,
-    tenLop: "11A7",
-    siSo: 40,
-  },
-  {
-    id: 17,
-    khoi: 11,
-    tenLop: "11A8",
-    siSo: 36,
-  },
-  {
-    id: 18,
-    khoi: 11,
-    tenLop: "11A9",
-    siSo: 38,
-  },
-  {
-    id: 19,
-    khoi: 12,
-    tenLop: "12A1",
-    siSo: 40,
-  },
-  {
-    id: 20,
-    khoi: 12,
-    tenLop: "12A2",
-    siSo: 36,
-  },
-  {
-    id: 21,
-    khoi: 12,
-    tenLop: "12A3",
-    siSo: 38,
-  },
-  {
-    id: 22,
-    khoi: 12,
-    tenLop: "12A4",
-    siSo: 40,
-  },
-  {
-    id: 23,
-    khoi: 12,
-    tenLop: "12A5",
-    siSo: 36,
-  },
-  {
-    id: 24,
-    khoi: 12,
-    tenLop: "12A6",
-    siSo: 38,
-  },
-  {
-    id: 25,
-    khoi: 12,
-    tenLop: "12A7",
-    siSo: 40,
-  },
-  {
-    id: 26,
-    khoi: 12,
-    tenLop: "12A8",
-    siSo: 36,
-  },
-  {
-    id: 27,
-    khoi: 12,
-    tenLop: "12A9",
-    siSo: 38,
-  },
-];
 export default ClassList;

@@ -57,7 +57,7 @@ const ClassItem = (props) => {
             mt="20px"
             color="text.primary"
           >
-            {props.class.siSo}
+            {40}
           </Typography>
           <Typography
             variant="subtitle1"

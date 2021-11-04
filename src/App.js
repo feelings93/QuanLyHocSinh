@@ -1,15 +1,18 @@
 import { Route, Redirect, Switch } from "react-router-dom";
-import React, { Suspense } from "react";
+import React, { Suspense, useState, useEffect } from "react";
 import "./App.css";
 import Header from "./components/layout/Header/Header";
 import SideBar from "./components/layout/SideBar/SideBar";
 import Box from "@mui/material/Box";
+import useHttp from "./hooks/use-http";
+import { getUser } from "./lib/api";
 import CircularProgress from "@mui/material/CircularProgress";
 import DateAdapter from "@mui/lab/AdapterMoment";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { viVN } from "@mui/material/locale";
 import Users from "./pages/Users";
+import Login from "./pages/Login";
 const Home = React.lazy(() => import("./pages/Home"));
 const Students = React.lazy(() => import("./pages/Students"));
 const Classes = React.lazy(() => import("./pages/Classes"));
@@ -71,62 +74,91 @@ const theme = createTheme(
   viVN
 );
 function App() {
+  const { sendRequest, status, data, error } = useHttp(getUser, true);
+  useEffect(() => {
+    sendRequest();
+  }, [sendRequest]);
+  if (status === "pending")
+    return (
+      <Box
+        sx={{
+          width: "100%",
+          height: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
   return (
     <ThemeProvider theme={theme}>
       <LocalizationProvider dateAdapter={DateAdapter}>
-        <Box sx={{ display: "flex" }}>
-          <SideBar />
-          <Box sx={{ flex: "1" }}>
-            <Header />
-            <main>
-              <Suspense
-                fallback={
-                  <Box
-                    sx={{
-                      width: "100%",
-                      minHeight: "calc(100vh - 48px)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <CircularProgress />
-                  </Box>
-                }
-              >
-                <Switch>
-                  <Route exact path="/">
-                    <Redirect to="/home"></Redirect>
-                  </Route>
-                  <Route exact path="/home">
-                    <Home />
-                  </Route>
-                  <Route path="/students">
-                    <Students />
-                  </Route>
-                  <Route path="/classes">
-                    <Classes />
-                  </Route>
-                  <Route path="/courses">
-                    <Courses />
-                  </Route>
-                  <Route exact path="/transcript">
-                    <Transcript />
-                  </Route>
-                  <Route exact path="/statistic">
-                    <Statistic />
-                  </Route>
-                  <Route exact path="/users">
-                    <Users />
-                  </Route>
-                  <Route exact path="/rules">
-                    <Regulation />
-                  </Route>
-                </Switch>
-              </Suspense>
-            </main>
-          </Box>
-        </Box>
+        <Switch>
+          <Route exact path="/login">
+            {error ? <Login /> : <Redirect to="/" />}
+          </Route>
+          <Route path="/">
+            {!error ? (
+              <Box sx={{ display: "flex" }}>
+                <SideBar />
+                <Box sx={{ flex: "1" }}>
+                  <Header nameUser={data.name} />
+                  <main>
+                    <Suspense
+                      fallback={
+                        <Box
+                          sx={{
+                            width: "100%",
+                            minHeight: "calc(100vh - 48px)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <CircularProgress />
+                        </Box>
+                      }
+                    >
+                      <Switch>
+                        <Route exact path="/">
+                          <Redirect to="/home"></Redirect>
+                        </Route>
+                        <Route exact path="/home">
+                          <Home />
+                        </Route>
+                        <Route path="/students">
+                          <Students />
+                        </Route>
+                        <Route path="/classes">
+                          <Classes />
+                        </Route>
+                        <Route path="/courses">
+                          <Courses />
+                        </Route>
+                        <Route exact path="/transcript">
+                          <Transcript />
+                        </Route>
+                        <Route exact path="/statistic">
+                          <Statistic />
+                        </Route>
+                        <Route exact path="/users">
+                          <Users />
+                        </Route>
+                        <Route exact path="/rules">
+                          <Regulation />
+                        </Route>
+                      </Switch>
+                    </Suspense>
+                  </main>
+                </Box>
+              </Box>
+            ) : (
+              <Redirect to="/login" />
+            )}
+          </Route>
+        </Switch>
       </LocalizationProvider>
     </ThemeProvider>
   );
