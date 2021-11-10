@@ -96,7 +96,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <LocalizationProvider dateAdapter={DateAdapter}>
         <Switch>
-          <Route exact path="/login">
+       <Route exact path="/login">
             {error ? <Login /> : <Redirect to="/" />}
           </Route>
           <Route path="/">
@@ -104,7 +104,7 @@ function App() {
               <Box sx={{ display: "flex" }}>
                 <SideBar />
                 <Box sx={{ flex: "1" }}>
-                  <Header nameUser={data.name} />
+              <Header nameUser={data.name} /> 
                   <main>
                     <Suspense
                       fallback={
