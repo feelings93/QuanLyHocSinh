@@ -6,7 +6,6 @@ import Typography from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { EditOutlined } from "@mui/icons-material";
 import { makeStyles } from "@mui/styles";
-
 const useStyles = makeStyles({
   root: {
     "&.MuiDataGrid-root .MuiDataGrid-columnHeader:focus, &.MuiDataGrid-root .MuiDataGrid-cell:focus, &.MuiDataGrid-root .MuiDataGrid-cell:focus-within, &.MuiDataGrid-root .MuiDataGrid-columnHeader:focus-within":
@@ -26,8 +25,8 @@ const CoursesTable = (props) => {
 
   const columns = [
     { field: "id", headerName: "Mã chương trình học", width: 150 },
-    { field: "monHoc", headerName: "Môn học", width: 150 },
-    { field: "khoi", headerName: "Khối", width: 150 },
+    { field: "tenMH", headerName: "Môn học", width: 150 },
+    { field: "tenKhoi", headerName: "Khối", width: 150 },
     { field: "heSo", headerName: "Hệ số", width: 150 },
     {
       field: "action",

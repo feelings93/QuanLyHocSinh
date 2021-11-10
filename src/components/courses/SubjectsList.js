@@ -9,12 +9,20 @@ import AddSubjectForm from "./AddSubjectForm";
 import EditSubjectForm from "./EditSubjectForm";
 import SubjectsTable from "./SubjectsTable";
 import { useHistory } from "react-router-dom";
+import useHttp from "../../hooks/use-http";
+import { getAllSubjects } from "../../lib/api";
+import Loading from "../UI/Loading";
 const SubjectsList = () => {
+  const { sendRequest, data, error, status } = useHttp(getAllSubjects, true);
+  React.useEffect(() => {
+    sendRequest();
+  }, [sendRequest]);
   const history = useHistory();
   const [isAddSubjectDialogVisible, setIsAddSubjectDialogVisible] =
     React.useState(false);
   const [isEditSubjectDialogVisible, setIsEditSubjectDialogVisible] =
     React.useState(false);
+  const [idSubject, setIdSubject] = React.useState(1);
   const showAddSubjectHandler = () => {
     setIsAddSubjectDialogVisible(true);
   };
@@ -22,6 +30,7 @@ const SubjectsList = () => {
     setIsAddSubjectDialogVisible(false);
   };
   const showEditSubjectHandler = (id) => {
+    setIdSubject(id);
     setIsEditSubjectDialogVisible(true);
   };
   const hideEditSubjectHandler = () => {
@@ -30,6 +39,10 @@ const SubjectsList = () => {
   const moveToCoursesPageHandler = () => {
     history.push(`/courses`);
   };
+  if (status === "pending") return <Loading />;
+  if (error) {
+    return <p>{error}</p>;
+  }
   return (
     <>
       <Breadcrumbs mb="16px" aria-label="breadcrumb">
@@ -73,22 +86,20 @@ const SubjectsList = () => {
           <SubjectsTable onShowEdit={showEditSubjectHandler} data={data} />
         </Grid>
       </Grid>
-      <AddSubjectForm
-        open={isAddSubjectDialogVisible}
-        onClose={hideAddSubjectHandler}
-      />
+
+      {isAddSubjectDialogVisible && (
+        <AddSubjectForm
+          open={isAddSubjectDialogVisible}
+          onClose={hideAddSubjectHandler}
+        />
+      )}
+
       <EditSubjectForm
+        maMH={idSubject}
         open={isEditSubjectDialogVisible}
         onClose={hideEditSubjectHandler}
       />
     </>
   );
 };
-const data = [
-  { id: 1, tenMonHoc: "Toán", diemDat: 5 },
-  { id: 2, tenMonHoc: "Lý", diemDat: 5 },
-  { id: 3, tenMonHoc: "Hóa", diemDat: 5 },
-  { id: 4, tenMonHoc: "Sinh", diemDat: 5 },
-  { id: 5, tenMonHoc: "Văn", diemDat: 5 },
-];
 export default SubjectsList;

@@ -1,6 +1,5 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
@@ -12,6 +11,7 @@ import { useHistory, useRouteMatch } from "react-router-dom";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
 import { Search } from "@mui/icons-material";
+import Loading from "../UI/Loading";
 const StudentsList = () => {
   const { sendRequest, status, data, error } = useHttp(getAllStudents, true);
   const history = useHistory();
@@ -23,19 +23,7 @@ const StudentsList = () => {
     history.push(url + "/add");
   };
   if (status === "pending") {
-    return (
-      <Box
-        sx={{
-          width: "100%",
-          minHeight: "calc(100vh - 48px)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
+    return <Loading />;
   }
   if (error) {
     return <p className="centered focused">{error}</p>;

@@ -26,7 +26,7 @@ const SubjectsTable = (props) => {
 
   const columns = [
     { field: "id", headerName: "Mã môn học", width: 150 },
-    { field: "tenMonHoc", headerName: "Tên môn học", width: 150 },
+    { field: "tenMH", headerName: "Tên môn học", width: 150 },
     { field: "diemDat", headerName: "Điểm đạt", width: 150 },
     {
       field: "action",
@@ -36,7 +36,11 @@ const SubjectsTable = (props) => {
       align: "center",
       width: 150,
       renderCell: (params) => (
-        <IconButton title="Sửa" variant="dark" onClick={props.onShowEdit}>
+        <IconButton
+          title="Sửa"
+          variant="dark"
+          onClick={props.onShowEdit.bind(null, params.id)}
+        >
           <EditOutlined />
         </IconButton>
       ),

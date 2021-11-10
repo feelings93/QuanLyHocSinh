@@ -1,6 +1,6 @@
 import axios from "axios";
 import moment from "moment";
-
+import qs from "qs";
 // const FIREBASE_DOMAIN = "https://practice-e56ad-default-rtdb.firebaseio.com";
 
 // const BACKEND_DOMAIN = "http://localhost:8000";
@@ -55,8 +55,6 @@ export async function getStudentById(id) {
 
   if (response.status === 401) {
     throw new Error(data.message || "Not auth");
-  } else if (response.status !== 200) {
-    throw new Error(data.message || "Could not fetch student.");
   }
   return data;
 }
@@ -79,8 +77,6 @@ export async function addStudent(request) {
 
   if (response.status === 401) {
     throw new Error(data.message || "Not auth.");
-  } else if (response.status !== 200) {
-    throw new Error(data.message || "somthing went wrong");
   }
 
   return data;
@@ -104,8 +100,6 @@ export async function editStudent(request) {
 
   if (response.status === 401) {
     throw new Error(data.message || "Not auth.");
-  } else if (response.status !== 200) {
-    throw new Error(data.message || "somthing went wrong");
   }
 
   return data;
@@ -137,8 +131,89 @@ export async function addClass(request) {
 
   if (response.status === 401) {
     throw new Error(data.message || "Not auth.");
-  } else if (response.status !== 200) {
-    throw new Error(data.message || "somthing went wrong");
+  }
+  return data;
+}
+// Chương trình học
+export async function getAllCourses() {
+  const response = await axios.get(`${BACKEND_DOMAIN}/api/cth`, {
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("accessToken"),
+    },
+  });
+  const data = await response.data;
+  if (response.status === 401) {
+    throw new Error("Chưa đăng nhập");
+  }
+
+  for (var i = 0; i < data.length; i++) {
+    data[i].id = data[i].maCTH;
+  }
+  return data;
+}
+//  Môn học
+export async function getAllSubjects() {
+  const response = await axios.get(`${BACKEND_DOMAIN}/api/mon-hoc`, {
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("accessToken"),
+    },
+  });
+  const data = await response.data;
+  if (response.status === 401) {
+    throw new Error("Chưa đăng nhập");
+  }
+
+  for (var i = 0; i < data.length; i++) {
+    data[i].id = data[i].maMH;
+  }
+  return data;
+}
+
+export async function addSubject(request) {
+  var formData = new FormData();
+  formData.append("tenMH", request.tenMH);
+  formData.append("diemDat", request.diemDat);
+  formData.append("token", localStorage.getItem("accessToken"));
+  const response = await axios.post(`${BACKEND_DOMAIN}/api/mon-hoc`, formData);
+  const data = await response.data;
+
+  if (response.status === 401) {
+    throw new Error(data.message || "Not auth.");
+  }
+  return data;
+}
+
+export async function getSubjectById(id) {
+  const response = await axios.get(`${BACKEND_DOMAIN}/api/mon-hoc/${id}`, {
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("accessToken"),
+    },
+  });
+  const data = await response.data;
+  if (response.status === 401) {
+    throw new Error("Chưa đăng nhập");
+  }
+  return data;
+}
+
+export async function editSubject(request) {
+  var params = new URLSearchParams();
+  params.append("tenMH", request.tenMH);
+  params.append("diemDat", request.diemDat);
+  params.append("token", localStorage.getItem("accessToken"));
+  const response = await axios.put(
+    `${BACKEND_DOMAIN}/api/mon-hoc/${request.maMH}`,
+    params,
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    }
+  );
+  const data = await response.data;
+
+  if (response.status === 401) {
+    throw new Error(data.message || "Not auth.");
   }
   return data;
 }

@@ -63,7 +63,7 @@ const EditCourseForm = (props) => {
       </DialogContent>
       <DialogActions>
         <Button variant="contained" onClick={props.onClose}>
-          Thêm
+          Xác nhận
         </Button>
         <Button onClick={props.onClose}>Hủy bỏ</Button>
       </DialogActions>

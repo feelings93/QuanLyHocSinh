@@ -9,8 +9,14 @@ import Stack from "@mui/material/Stack";
 import AddCourseForm from "./AddCourseForm";
 import EditCourseForm from "./EditCourseForm";
 import { useRouteMatch, useHistory } from "react-router-dom";
-
+import useHttp from "../../hooks/use-http";
+import { getAllCourses } from "../../lib/api";
+import Loading from "../UI/Loading";
 const CoursesList = () => {
+  const { sendRequest, data, status, error } = useHttp(getAllCourses, true);
+  React.useEffect(() => {
+    sendRequest();
+  }, [sendRequest]);
   const history = useHistory();
   const { url } = useRouteMatch();
   const [isAddCourseDialogVisible, setIsAddCourseDialogVisible] =
@@ -32,6 +38,10 @@ const CoursesList = () => {
   const moveToSubjectPage = () => {
     history.push(`${url}/subjects`);
   };
+  if (status === "pending") return <Loading />;
+  if (error) {
+    return <p>{error}</p>;
+  }
   return (
     <>
       <Breadcrumbs mb="16px" aria-label="breadcrumb">
@@ -83,15 +93,5 @@ const CoursesList = () => {
     </>
   );
 };
-const data = [
-  { id: 1, monHoc: "Lý", khoi: "10", heSo: 1 },
-  { id: 2, monHoc: "Hóa", khoi: "10", heSo: 1 },
-  { id: 3, monHoc: "Sinh", khoi: "10", heSo: 1 },
-  { id: 4, monHoc: "Sử", khoi: "10", heSo: 1 },
-  { id: 5, monHoc: "Địa", khoi: "10", heSo: 1 },
-  { id: 6, monHoc: "Văn", khoi: "10", heSo: 1 },
-  { id: 7, monHoc: "Đạo đức", khoi: "10", heSo: 1 },
-  { id: 8, monHoc: "Hóa", khoi: "10", heSo: 1 },
-];
 
 export default CoursesList;
