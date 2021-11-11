@@ -2,17 +2,14 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Grid";
-import Button from "@mui/material/Button";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import React, { useEffect } from "react";
 import useHttp from "../../hooks/use-http";
 import { getAllStudents } from "../../lib/api";
 import TopStudentTable from "./TopStudentTable";
-import { useHistory } from "react-router-dom";
 
 const TopStudentList = () => {
   const { sendRequest, status, data, error } = useHttp(getAllStudents, true);
-  const history = useHistory();
   useEffect(() => {
     sendRequest();
   }, [sendRequest]);

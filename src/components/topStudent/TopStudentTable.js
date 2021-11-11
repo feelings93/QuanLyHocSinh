@@ -1,7 +1,5 @@
 import React from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import IconButton from "@mui/material/IconButton";
-import { CenterFocusStrong, MoreVert } from "@mui/icons-material";
 // const rows = [
 //   {
 //     id: 1,
@@ -40,22 +38,21 @@ import { CenterFocusStrong, MoreVert } from "@mui/icons-material";
 //   },
 // ];
 const columns = [
-  { field: "id", headerName: "Mã HS", width: 120, },
+  { field: "id", headerName: "Mã HS", width: 120 },
   { field: "hoTen", headerName: "Họ tên", width: 200 },
   { field: "lop", headerName: "Lớp", width: 80 },
   { field: "diaChi", headerName: "Địa chỉ", width: 250 },
   { field: "diemtongket", headerName: "Tổng điểm", width: 150 },
-
 ];
 
 const TopStudentTable = (props) => {
   return (
-    <div style={{ height: "500px", width: "100%"}}>
-      <DataGrid 
-        disableColumnMenu    
-        disableSelectionOnClick    
+    <div style={{ height: "500px", width: "100%" }}>
+      <DataGrid
+        disableColumnMenu
+        disableSelectionOnClick
         rows={props.data}
-        columns={columns} 
+        columns={columns}
       />
     </div>
   );

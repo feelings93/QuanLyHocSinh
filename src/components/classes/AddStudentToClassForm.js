@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -9,19 +9,66 @@ import Autocomplete from "@mui/material/Autocomplete";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import Checkbox from "@mui/material/Checkbox";
+import useHttp from "../../hooks/use-http";
+import { getStudentsEmpty, addStudentsToClass } from "../../lib/api";
+import BackdropLoading from "../UI/BackdropLoading";
+import swal from "sweetalert";
+import LinearLoading from "../UI/LinearLoading";
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 const AddStudentToClassForm = (props) => {
+  const { sendRequest, status, error, data } = useHttp(getStudentsEmpty, true);
+  useEffect(() => {
+    sendRequest(1);
+  }, [sendRequest]);
+  if (status === "pending") return <BackdropLoading />;
+  if (error) return <p>{error}</p>;
+  return (
+    <Dialog open={props.open} onClose={props.onClose}>
+      <AddStudentToClassContent
+        maHK={props.maHK}
+        maLop={props.maLop}
+        data={data}
+        onClose={props.onClose}
+        onReload={props.onReload}
+      />
+    </Dialog>
+  );
+};
+
+const AddStudentToClassContent = (props) => {
+  const { sendRequest, status, error, data } = useHttp(addStudentsToClass);
+
+  useEffect(() => {
+    if (status === "completed") {
+      props.onClose();
+      console.log(data);
+      if (data) {
+        swal(
+          "Thêm thành công!",
+          "Bạn đã thêm học sinh vào lớp thành công",
+          "success"
+        );
+        props.onReload();
+      } else if (error) swal("Đã có lỗi xảy ra", error, "error");
+    }
+  }, [data, error, status, props]);
   const [addedStudents, setAddedStudents] = React.useState([]);
   const changeSelectedStudentHandler = (event, value) => {
     setAddedStudents(value);
   };
-  const addStudentToClassHandler = () => {
-    console.log(addedStudents);
-    props.onClose();
+  const addStudentToClassHandler = (event) => {
+    event.preventDefault();
+    let request = {
+      maHS: addedStudents.map((item) => item.maHS),
+      maHK: props.maHK,
+      maLop: props.maLop,
+    };
+    sendRequest(request);
   };
   return (
-    <Dialog open={props.open} onClose={props.onClose}>
+    <form onSubmit={addStudentToClassHandler}>
+      {status === "pending" && <LinearLoading />}
       <DialogTitle>Thêm học sinh vào lớp</DialogTitle>
       <DialogContent>
         <Autocomplete
@@ -30,7 +77,7 @@ const AddStudentToClassForm = (props) => {
           value={addedStudents}
           multiple
           id="students"
-          options={studentsList}
+          options={props.data}
           disableCloseOnSelect
           getOptionLabel={(option) => option.hoTen}
           renderOption={(props, option, { selected }) => (
@@ -55,49 +102,17 @@ const AddStudentToClassForm = (props) => {
         />
       </DialogContent>
       <DialogActions>
-        <Button variant="contained" onClick={addStudentToClassHandler}>
-          Thêm
+        <Button
+          disabled={status === "pending"}
+          variant="contained"
+          type="submit"
+        >
+          {status === "pending" ? "Đang thêm..." : "Thêm"}
         </Button>
         <Button onClick={props.onClose}>Hủy bỏ</Button>
       </DialogActions>
-    </Dialog>
+    </form>
   );
 };
-const studentsList = [
-  {
-    id: 1,
-    hoTen: "Nguyễn Cao Cường",
-    ngaySinh: "09/03/2001",
-    gioiTinh: "Nam",
-    diaChi: "Đăk Lăk",
-  },
-  {
-    id: 2,
-    hoTen: "Nguyễn Hồng Anh",
-    ngaySinh: "09/03/2001",
-    gioiTinh: "Nam",
-    diaChi: "Đăk Lăk",
-  },
-  {
-    id: 3,
-    hoTen: "Nguyễn Duy Hoàng",
-    ngaySinh: "09/03/2001",
-    gioiTinh: "Nam",
-    diaChi: "Đăk Lăk",
-  },
-  {
-    id: 4,
-    hoTen: "Nguyễn Văn A",
-    ngaySinh: "09/03/2001",
-    gioiTinh: "Nam",
-    diaChi: "Đăk Lăk",
-  },
-  {
-    id: 5,
-    hoTen: "Nguyễn Mạnh Cường",
-    ngaySinh: "09/03/2001",
-    gioiTinh: "Nam",
-    diaChi: "Đăk Lăk",
-  },
-];
+
 export default AddStudentToClassForm;

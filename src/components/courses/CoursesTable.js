@@ -36,7 +36,11 @@ const CoursesTable = (props) => {
       align: "center",
       width: 150,
       renderCell: (params) => (
-        <IconButton title="Sửa" variant="dark" onClick={props.onShowEdit}>
+        <IconButton
+          title="Sửa"
+          variant="dark"
+          onClick={props.onShowEdit.bind(null, params.row)}
+        >
           <EditOutlined />
         </IconButton>
       ),

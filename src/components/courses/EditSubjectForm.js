@@ -8,7 +8,10 @@ import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import useHttp from "../../hooks/use-http";
 import { editSubject, getSubjectById } from "../../lib/api";
-import { CircularProgress, Backdrop } from "@mui/material";
+import BackdropLoading from "../UI/BackdropLoading";
+import swal from "sweetalert";
+import LinearLoading from "../UI/LinearLoading";
+
 const EditSubjectForm = (props) => {
   const {
     sendRequest: getSubject,
@@ -20,27 +23,36 @@ const EditSubjectForm = (props) => {
     getSubject(props.maMH);
   }, [props.maMH, getSubject]);
 
-  if (statusGet === "pending")
-    return (
-      <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={true}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
-    );
+  if (statusGet === "pending") return <BackdropLoading />;
   if (errorGet) return <p>errorGet</p>;
 
   return (
     <Dialog open={props.open} onClose={props.onClose}>
-      <EditSubjectContent onClose={props.onClose} subject={dataGet} />
+      <EditSubjectContent
+        onReload={props.onReload}
+        onClose={props.onClose}
+        subject={dataGet}
+      />
     </Dialog>
   );
 };
 
 const EditSubjectContent = (props) => {
   const { sendRequest, status, error, data } = useHttp(editSubject);
-
+  React.useEffect(() => {
+    if (status === "completed") {
+      props.onClose();
+      console.log(data);
+      if (data) {
+        swal(
+          "Cập nhật thành công!",
+          "Bạn đã cập nhật môn học thành công!",
+          "success"
+        );
+        props.onReload();
+      } else if (error) swal("Đã có lỗi xảy ra", error, "error");
+    }
+  }, [data, error, status, props]);
   const editSubjectSubmitHandler = (event) => {
     event.preventDefault();
     console.log({
@@ -64,6 +76,7 @@ const EditSubjectContent = (props) => {
   };
   return (
     <form onSubmit={editSubjectSubmitHandler}>
+      {status === "pending" && <LinearLoading />}
       <DialogTitle>Cập nhật môn học</DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ width: "200px" }}>

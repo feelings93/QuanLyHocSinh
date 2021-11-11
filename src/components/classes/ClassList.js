@@ -10,14 +10,20 @@ import MenuItem from "@mui/material/MenuItem";
 import Box from "@mui/material/Box";
 import Fab from "@mui/material/Fab";
 import { Add } from "@mui/icons-material";
+import Loading from "../UI/Loading";
 import AddClassForm from "./AddClassForm";
 import { getAllClasses } from "../../lib/api";
 import useHttp from "../../hooks/use-http";
 const ClassList = (props) => {
   const { sendRequest, status, data, error } = useHttp(getAllClasses, true);
+  const [isReload, setIsReload] = React.useState(true);
+
   React.useEffect(() => {
-    sendRequest();
-  }, [sendRequest]);
+    if (isReload === true) {
+      sendRequest();
+      setIsReload(false);
+    }
+  }, [sendRequest, isReload]);
   const [grade, setGrade] = React.useState(10);
   const [isAddClassDialogVisible, setIsAddClassDialogVisible] =
     React.useState(false);
@@ -30,7 +36,7 @@ const ClassList = (props) => {
   const hideAddClassHandler = () => {
     setIsAddClassDialogVisible(false);
   };
-  if (status === "pending") return <h4>Đang tải...</h4>;
+  if (status === "pending") return <Loading />;
   if (error) return <h4>Đã có lỗi xảy ra</h4>;
   const filteredClasses = data.filter((e) => e.maKhoi === grade - 9);
   return (
@@ -76,10 +82,15 @@ const ClassList = (props) => {
       >
         <Add sx={{ color: "#fff" }} />
       </Fab>
-      <AddClassForm
-        open={isAddClassDialogVisible}
-        onClose={hideAddClassHandler}
-      />
+      {isAddClassDialogVisible && (
+        <AddClassForm
+          open={isAddClassDialogVisible}
+          onClose={hideAddClassHandler}
+          onReload={() => {
+            setIsReload(true);
+          }}
+        />
+      )}
     </>
   );
 };

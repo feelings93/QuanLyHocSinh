@@ -1,6 +1,5 @@
 import axios from "axios";
 import moment from "moment";
-import qs from "qs";
 // const FIREBASE_DOMAIN = "https://practice-e56ad-default-rtdb.firebaseio.com";
 
 // const BACKEND_DOMAIN = "http://localhost:8000";
@@ -104,7 +103,7 @@ export async function editStudent(request) {
 
   return data;
 }
-
+// Lớp
 export async function getAllClasses() {
   const response = await axios.get(`${BACKEND_DOMAIN}/api/lop`, {
     headers: {
@@ -134,6 +133,83 @@ export async function addClass(request) {
   }
   return data;
 }
+export async function getClassesById(id) {
+  const response = await axios.get(
+    `${BACKEND_DOMAIN}/api/lop/${id[0]}/${id[1]}`,
+    {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+    }
+  );
+  const data = await response.data;
+  if (response.status === 401) {
+    throw new Error("Chưa đăng nhập");
+  }
+  for (var i = 0; i < data.hocSinh.length; i++) {
+    data.hocSinh[i].id = data.hocSinh[i].maHS;
+  }
+  return data;
+}
+export async function getStudentsEmpty(id) {
+  const response = await axios.get(
+    `${BACKEND_DOMAIN}/api/hoc-sinh-trong/${id}`,
+    {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+    }
+  );
+  const data = await response.data;
+  if (response.status === 401) {
+    throw new Error("Chưa đăng nhập");
+  }
+  for (var i = 0; i < data.length; i++) {
+    data[i].id = data[i].maHS;
+  }
+  return data;
+}
+export async function addStudentsToClass(request) {
+  var params = new URLSearchParams();
+  params.append("maHS", JSON.stringify(request.maHS));
+  params.append("token", localStorage.getItem("accessToken"));
+  const response = await axios.post(
+    `${BACKEND_DOMAIN}/api/lop/${request.maLop}/${request.maHK}`,
+    params,
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    }
+  );
+  const data = await response.data;
+
+  if (response.status === 401) {
+    throw new Error(data.message || "Not auth.");
+  }
+  return data;
+}
+
+export async function delStudentsFromClass(request) {
+  var params = new URLSearchParams();
+  params.append("maHS", JSON.stringify(request.maHS));
+  params.append("token", localStorage.getItem("accessToken"));
+  const response = await axios.post(
+    `${BACKEND_DOMAIN}/api/lop/xoa-hoc-sinh/${request.maLop}/${request.maHK}`,
+    params,
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    }
+  );
+  const data = await response.data;
+
+  if (response.status === 401) {
+    throw new Error(data.message || "Not auth.");
+  }
+  return data;
+}
 // Chương trình học
 export async function getAllCourses() {
   const response = await axios.get(`${BACKEND_DOMAIN}/api/cth`, {
@@ -148,6 +224,46 @@ export async function getAllCourses() {
 
   for (var i = 0; i < data.length; i++) {
     data[i].id = data[i].maCTH;
+  }
+  return data;
+}
+export async function addCourse(request) {
+  var params = new URLSearchParams();
+  params.append("maMH", request.maMH);
+  params.append("maKhoi", request.maKhoi);
+  params.append("heSo", request.heSo);
+  params.append("token", localStorage.getItem("accessToken"));
+  const response = await axios.post(`${BACKEND_DOMAIN}/api/cth`, params, {
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  });
+  const data = await response.data;
+
+  if (response.status === 401) {
+    throw new Error(data.message || "Not auth.");
+  }
+  return data;
+}
+export async function editCourse(request) {
+  var params = new URLSearchParams();
+  params.append("maMH", request.maMH);
+  params.append("maKhoi", request.maKhoi);
+  params.append("heSo", request.heSo);
+  params.append("token", localStorage.getItem("accessToken"));
+  const response = await axios.put(
+    `${BACKEND_DOMAIN}/api/cth/${request.maCTH}`,
+    params,
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    }
+  );
+  const data = await response.data;
+
+  if (response.status === 401) {
+    throw new Error(data.message || "Not auth.");
   }
   return data;
 }

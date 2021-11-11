@@ -14,9 +14,13 @@ import { getAllSubjects } from "../../lib/api";
 import Loading from "../UI/Loading";
 const SubjectsList = () => {
   const { sendRequest, data, error, status } = useHttp(getAllSubjects, true);
+  const [isReload, setIsReload] = React.useState(true);
   React.useEffect(() => {
-    sendRequest();
-  }, [sendRequest]);
+    if (isReload === true) {
+      sendRequest();
+      setIsReload(false);
+    }
+  }, [sendRequest, isReload]);
   const history = useHistory();
   const [isAddSubjectDialogVisible, setIsAddSubjectDialogVisible] =
     React.useState(false);
@@ -91,14 +95,22 @@ const SubjectsList = () => {
         <AddSubjectForm
           open={isAddSubjectDialogVisible}
           onClose={hideAddSubjectHandler}
+          onReload={() => {
+            setIsReload(true);
+          }}
         />
       )}
 
-      <EditSubjectForm
-        maMH={idSubject}
-        open={isEditSubjectDialogVisible}
-        onClose={hideEditSubjectHandler}
-      />
+      {isEditSubjectDialogVisible && (
+        <EditSubjectForm
+          maMH={idSubject}
+          open={isEditSubjectDialogVisible}
+          onClose={hideEditSubjectHandler}
+          onReload={() => {
+            setIsReload(true);
+          }}
+        />
+      )}
     </>
   );
 };

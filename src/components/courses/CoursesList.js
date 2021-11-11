@@ -10,26 +10,35 @@ import AddCourseForm from "./AddCourseForm";
 import EditCourseForm from "./EditCourseForm";
 import { useRouteMatch, useHistory } from "react-router-dom";
 import useHttp from "../../hooks/use-http";
-import { getAllCourses } from "../../lib/api";
+import { getAllCourses, getAllSubjects } from "../../lib/api";
 import Loading from "../UI/Loading";
+import BackdropLoading from "../UI/BackdropLoading";
 const CoursesList = () => {
   const { sendRequest, data, status, error } = useHttp(getAllCourses, true);
+  const [isReload, setIsReload] = React.useState(true);
   React.useEffect(() => {
-    sendRequest();
-  }, [sendRequest]);
+    if (isReload === true) {
+      sendRequest();
+      setIsReload(false);
+    }
+  }, [sendRequest, isReload]);
   const history = useHistory();
   const { url } = useRouteMatch();
   const [isAddCourseDialogVisible, setIsAddCourseDialogVisible] =
     React.useState(false);
   const [isEditCourseDialogVisible, setIsEditCourseDialogVisible] =
     React.useState(false);
+  const [editCourse, setEditCourse] = React.useState(null);
+
   const showAddCourseHandler = () => {
     setIsAddCourseDialogVisible(true);
   };
   const hideAddCourseHandler = () => {
     setIsAddCourseDialogVisible(false);
   };
-  const showEditCourseHandler = (id) => {
+  const showEditCourseHandler = (course) => {
+    setEditCourse(course);
+
     setIsEditCourseDialogVisible(true);
   };
   const hideEditCourseHandler = () => {
@@ -82,14 +91,49 @@ const CoursesList = () => {
           <CoursesTable onShowEdit={showEditCourseHandler} data={data} />
         </Grid>
       </Grid>
-      <AddCourseForm
-        open={isAddCourseDialogVisible}
-        onClose={hideAddCourseHandler}
+      <CoursesDialog
+        openAdd={isAddCourseDialogVisible}
+        onCloseAdd={hideAddCourseHandler}
+        openEdit={isEditCourseDialogVisible}
+        onCloseEdit={hideEditCourseHandler}
+        editCourse={editCourse}
+        onReload={() => {
+          setIsReload(true);
+        }}
       />
-      <EditCourseForm
-        open={isEditCourseDialogVisible}
-        onClose={hideEditCourseHandler}
-      />
+    </>
+  );
+};
+
+const CoursesDialog = (props) => {
+  const { sendRequest, data, status, error } = useHttp(getAllSubjects, true);
+  React.useState(() => {
+    sendRequest();
+  }, [sendRequest]);
+  if (status === "pending") {
+    if (props.openAdd || props.openEdit) return <BackdropLoading />;
+    else return <></>;
+  }
+  if (error) return <p>{error}</p>;
+  return (
+    <>
+      {props.openAdd && (
+        <AddCourseForm
+          subjects={data}
+          open={props.openAdd}
+          onClose={props.onCloseAdd}
+          onReload={props.onReload}
+        />
+      )}
+      {props.openEdit && (
+        <EditCourseForm
+          editCourse={props.editCourse}
+          subjects={data}
+          open={props.openEdit}
+          onClose={props.onCloseEdit}
+          onReload={props.onReload}
+        />
+      )}
     </>
   );
 };

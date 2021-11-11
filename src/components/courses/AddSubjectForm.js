@@ -9,19 +9,21 @@ import Dialog from "@mui/material/Dialog";
 import swal from "sweetalert";
 import useHttp from "../../hooks/use-http";
 import { addSubject } from "../../lib/api";
+import LinearLoading from "../UI/LinearLoading";
 const AddSubjectForm = (props) => {
   const { sendRequest, status, data, error } = useHttp(addSubject);
   React.useEffect(() => {
     if (status === "completed") {
       props.onClose();
       console.log(data);
-      if (data)
+      if (data) {
         swal(
           "Thêm thành công!",
           "Bạn đã thêm môn học mới thành công",
           "success"
         );
-      else if (error) swal("Đã có lỗi xảy ra", error, "error");
+        props.onReload();
+      } else if (error) swal("Đã có lỗi xảy ra", error, "error");
     }
   }, [data, error, status, props]);
   const addSubjectHandler = (event) => {
@@ -38,6 +40,7 @@ const AddSubjectForm = (props) => {
   return (
     <Dialog open={props.open} onClose={props.onClose}>
       <form onSubmit={addSubjectHandler}>
+        {status === "pending" && <LinearLoading />}
         <DialogTitle>Thêm môn học</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ width: "200px" }}>

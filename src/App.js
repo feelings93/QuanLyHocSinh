@@ -75,9 +75,14 @@ const theme = createTheme(
 );
 function App() {
   const { sendRequest, status, data, error } = useHttp(getUser, true);
+  const [isReload, setIsReload] = useState(true);
   useEffect(() => {
-    sendRequest();
-  }, [sendRequest]);
+    if (isReload === true) {
+      sendRequest();
+      setIsReload(false);
+    }
+  }, [sendRequest, isReload]);
+
   if (status === "pending")
     return (
       <Box
@@ -96,15 +101,23 @@ function App() {
     <ThemeProvider theme={theme}>
       <LocalizationProvider dateAdapter={DateAdapter}>
         <Switch>
-       <Route exact path="/login">
-            {error ? <Login /> : <Redirect to="/" />}
+          <Route exact path="/login">
+            {error ? (
+              <Login
+                onReload={() => {
+                  setIsReload(true);
+                }}
+              />
+            ) : (
+              <Redirect to="/" />
+            )}
           </Route>
           <Route path="/">
             {!error ? (
               <Box sx={{ display: "flex" }}>
                 <SideBar />
                 <Box sx={{ flex: "1" }}>
-              <Header nameUser={data.name} /> 
+                  <Header nameUser={data.name} />
                   <main>
                     <Suspense
                       fallback={
