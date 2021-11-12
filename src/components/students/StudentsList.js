@@ -1,6 +1,5 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
@@ -8,31 +7,23 @@ import React, { useEffect } from "react";
 import useHttp from "../../hooks/use-http";
 import { getAllStudents } from "../../lib/api";
 import StudentsTable from "./StudentsTable";
-import { useHistory } from "react-router-dom";
-
+import { useHistory, useRouteMatch } from "react-router-dom";
+import InputAdornment from "@mui/material/InputAdornment";
+import TextField from "@mui/material/TextField";
+import { Search } from "@mui/icons-material";
+import Loading from "../UI/Loading";
 const StudentsList = () => {
   const { sendRequest, status, data, error } = useHttp(getAllStudents, true);
   const history = useHistory();
+  const { url } = useRouteMatch();
   useEffect(() => {
     sendRequest();
   }, [sendRequest]);
   const addStudentHandler = () => {
-    history.push("/students/add");
+    history.push(url + "/add");
   };
   if (status === "pending") {
-    return (
-      <Box
-        sx={{
-          width: "100%",
-          minHeight: "calc(100vh - 48px)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
+    return <Loading />;
   }
   if (error) {
     return <p className="centered focused">{error}</p>;
@@ -56,12 +47,37 @@ const StudentsList = () => {
           alignItems: "center",
         }}
       >
-        <Typography variant="h4" component="h2">
+        <Typography variant="h4" component="h2" sx={{ fontWeight: 700 }}>
           Danh sách học sinh
         </Typography>
-        <Button onClick={addStudentHandler} variant="contained" color="success">
-          Thêm
-        </Button>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <TextField
+            id="search"
+            label="Tìm kiếm"
+            variant="outlined"
+            size="small"
+            sx={{ marginRight: "8px" }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <Button
+            onClick={addStudentHandler}
+            variant="contained"
+            color="success"
+          >
+            Thêm
+          </Button>
+        </Box>
       </Box>
 
       <Grid
@@ -70,7 +86,7 @@ const StudentsList = () => {
           boxShadow: "0px 0px  30px 5px rgba(0, 0, 0, 0.08)",
         }}
       >
-        <Grid xs={12}>
+        <Grid item xs={12}>
           <StudentsTable data={data} />
         </Grid>
       </Grid>

@@ -42,6 +42,11 @@ const TAB_ITEMS = [
     title: "Quy định",
     icon: "chat",
   },
+  {
+    link: "/users",
+    title: "Người dùng",
+    icon: "person",
+  },
 ];
 const SideBar = () => {
   return (

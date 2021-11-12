@@ -4,6 +4,8 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import {BrowserRouter} from 'react-router-dom';
+import './assets/boxicons-2.0.9/css/boxicons.min.css'
+
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
