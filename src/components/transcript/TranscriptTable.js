@@ -1,24 +1,49 @@
 import React, { useEffect } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
-import { DeleteOutlined, EditOutlined } from "@mui/icons-material";
+import { EditOutlined } from "@mui/icons-material";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import EditDiem from "./EditDiem";
+import useHttp from "../../hooks/use-http";
+import { getAllTranscripts } from "../../lib/api";
+
 const TranscriptTable = (props) => {
+  const { sendRequest, error, data, status } = useHttp(getAllTranscripts);
   const [pageSize, setPageSize] = React.useState(15);
   const [selectedList, setSelectedList] = React.useState([]);
   const [edit, setEdit] = React.useState(false);
   const [editRowsModel, setEditRowsModel] = React.useState({});
-  const [id, setID] = React.useState("");
-  const [tenLop, setHoVaTen] = React.useState("");
-  const [hoTen, setLop] = React.useState("");
-  const [monhoc, setMonHoc] = React.useState("");
-  const [diemmieng, setMieng] = React.useState("");
-  const [diem15p, set15p] = React.useState("");
-  const [diem1tiet, set1t] = React.useState("");
-  const [diemhocky, setHK] = React.useState("");
+  const [editTranscript, setEditTranscript] = React.useState({});
+  const [bangDiem, setBangDiem] = React.useState([]);
 
+  useEffect(() => {
+    if (
+      props.lop !== "" &&
+      props.hocKy !== "" &&
+      props.monHoc &&
+      props.isReload
+    ) {
+      sendRequest({
+        maHK: props.hocKy.maHK,
+        maMH: props.monHoc.maMH,
+        maLop: props.lop.maLop,
+      });
+      props.setIsReload(false);
+    }
+  }, [
+    props.isReload,
+    props.hocKy,
+    props.lop,
+    props.monHoc,
+    sendRequest,
+    props,
+  ]);
+  useEffect(() => {
+    if (status === "completed" && data) {
+      setBangDiem(data);
+    }
+  }, [data, status]);
   const handleEditRowsModelChange = React.useCallback((model) => {
     setEditRowsModel(model);
     //alert(JSON.stringify(model[0]));
@@ -28,44 +53,39 @@ const TranscriptTable = (props) => {
   const hideEditDiemHandler = () => {
     setEditDiemDialogVisible(false);
   };
-  const showEditDiemHandler = () => {
-    setEditDiemDialogVisible(true);
-  };
-  const deleteStudentsHandler = () => {
-    console.log(selectedList);
-  };
-  const handleRowSelection = (e) => {
-    setID(e.selectionModel);
-    alert(e.id);
-  };
-
-  useEffect(() => {
-    //alert(id) // <-- The state is updated
-  }, [id]);
+  if (status === "pending") return <p>Đang tải ...</p>;
+  if (error) return <p>{error}</p>;
   const columns = [
     { field: "id", headerName: "Mã HS", width: 80 },
     { field: "tenLop", headerName: "Lớp", width: 100 },
     { field: "hoTen", headerName: "Họ tên", width: 190 },
     {
-      field: "diemmieng",
+      field: "diemMieng",
       headerName: "Điểm miệng",
       width: 150,
       editable: true,
     },
-    { field: "diem15p", headerName: "Điểm 15p", width: 150, editable: true },
+    { field: "diem15P", headerName: "Điểm 15p", width: 150, editable: true },
     {
-      field: "diem1tiet",
+      field: "diem1Tiet",
       headerName: "Điểm 1 tiết",
       width: 150,
       editable: true,
     },
     {
-      field: "diemhocky",
+      field: "diemHK",
       headerName: "Điểm học kì",
       width: 120,
       editable: true,
     },
-    { field: "diemtrungbinh", headerName: "Điểm trung bình", width: 140 },
+    {
+      field: "diemTBM",
+      headerName: "Điểm trung bình",
+      width: 140,
+      valueGetter: (params) => {
+        return params.row.diemTBM === -1 ? "Chưa tính" : params.row.diemTBM;
+      },
+    },
     {
       field: "action",
       type: "actions",
@@ -81,15 +101,15 @@ const TranscriptTable = (props) => {
             variant="dark"
             onClick={() => {
               setEdit(false);
-              setID(params.id);
-              setLop(params.row.tenLop);
-              setHoVaTen(params.row.hoTen);
-              setMieng(params.row.diemmieng);
-              set15p(params.row.diem15p);
-              set1t(params.row.diem1tiet);
-              setHK(params.row.diemhocky);
-              setEditDiemDialogVisible("true");
-              alert("Sao chỉ lấy đc mỗi id thôi ta");
+              setEditTranscript({
+                ...params.row,
+                maHK: props.hocKy.maHK,
+                maMH: props.monHoc.maMH,
+                maLop: props.lop.maLop,
+                tenMH: props.monHoc.tenMH,
+              });
+              console.log(params.row);
+              setEditDiemDialogVisible(true);
             }}
           >
             <EditOutlined />
@@ -112,13 +132,6 @@ const TranscriptTable = (props) => {
           <Typography variant="subtitle1">
             Đã chọn {selectedList.length}
           </Typography>
-          <IconButton
-            title="Xóa"
-            variant="dark"
-            onClick={deleteStudentsHandler}
-          >
-            <DeleteOutlined />
-          </IconButton>
         </Toolbar>
       )}
       {selectedList.length === 0 && <Toolbar></Toolbar>}
@@ -138,7 +151,7 @@ const TranscriptTable = (props) => {
         disableColumnMenu
         disableSelectionOnClick
         //  checkboxSelection
-        rows={rows}
+        rows={bangDiem}
         rowsPerPageOptions={[5, 10, 20]}
         columns={columns}
         editMode="row"
@@ -148,110 +161,18 @@ const TranscriptTable = (props) => {
         //onSelectionModelChange = {handleRowSelection}
       />
 
-      <EditDiem
-        open={isEditDiemDialogVisible}
-        onClose={hideEditDiemHandler}
-        _id={id}
-        _hoten={hoTen}
-        _lop={tenLop}
-        _monhoc={monhoc}
-        _diemmieng={diemmieng}
-        _diem15p={diem15p}
-        _diem1t={diem1tiet}
-        _diemhk={diemhocky}
-      />
+      {isEditDiemDialogVisible && (
+        <EditDiem
+          onReload={() => {
+            props.setIsReload(true);
+          }}
+          editTranscript={editTranscript}
+          open={isEditDiemDialogVisible}
+          onClose={hideEditDiemHandler}
+        />
+      )}
     </div>
   );
 };
 
 export default TranscriptTable;
-const rows = [
-  {
-    id: 1,
-    tenLop: "10A1",
-    hoTen: "Đinh Việt Hào",
-    diemmieng: "10 9 8",
-    diem15p: "10 9 8",
-    diem1tiet: "10 9 8",
-    diemhocky: "10",
-    diemtrungbinh: "Chưa tính",
-  },
-  {
-    id: 2,
-    tenLop: "10A1",
-    hoTen: "Đinh Việt Cường",
-    diemmieng: "10 9 8",
-    diem15p: "10 9 8",
-    diem1tiet: "10 9 8",
-    diemhocky: "10",
-    diemtrungbinh: "Chưa tính",
-  },
-  {
-    id: 3,
-    tenLop: "10A1",
-    hoTen: "Đinh Cao Hào",
-    diemmieng: "10 9 8",
-    diem15p: "10 9 8",
-    diem1tiet: "10 9 8",
-    diemhocky: "10",
-    diemtrungbinh: "Chưa tính",
-  },
-  {
-    id: 4,
-    tenLop: "10A1",
-    hoTen: "Nguyễn Việt Hào",
-    diemmieng: "10 9 8",
-    diem15p: "10 9 8",
-    diem1tiet: "10 9 8",
-    diemhocky: "10",
-    diemtrungbinh: "Chưa tính",
-  },
-  {
-    id: 5,
-    tenLop: "10A1",
-    hoTen: "Nguyễn Cao Cường",
-    diemmieng: "10 9 8",
-    diem15p: "10 9 8",
-    diem1tiet: "10 9 8",
-    diemhocky: "10",
-    diemtrungbinh: "Chưa tính",
-  },
-];
-
-//const rows1 = [
-// {
-//   id: 1,
-//   hoTen: "Nguyễn Cao Cường",
-//   gioiTinh: "Nam",
-//   ngaySinh: "09/03/2001",
-//   diaChi: "xã Eatar, huyện Cư M'gar, tỉnh Đăk Lăk",
-// },
-//  {
-//    id: 2,
-//    hoTen: "Nguyễn Cao Cường",
-//    gioiTinh: "Nam",
-//    ngaySinh: "09/03/2001",
-//    diaChi: "xã Eatar, huyện Cư M'gar, tỉnh Đăk Lăk",
-//  },]
-//   {
-//     id: 3,
-//     hoTen: "Nguyễn Cao Cường",
-//     gioiTinh: "Nam",
-//     ngaySinh: "09/03/2001",
-//     diaChi: "xã Eatar, huyện Cư M'gar, tỉnh Đăk Lăk",
-//   },
-//   {
-//     id: 4,
-//     hoTen: "Nguyễn Cao Cường",
-//     gioiTinh: "Nam",
-//     ngaySinh: "09/03/2001",
-//     diaChi: "xã Eatar, huyện Cư M'gar, tỉnh Đăk Lăk",
-//   },
-//   {
-//     id: 5,
-//     hoTen: "Nguyễn Cao Cường",
-//     gioiTinh: "Nam",
-//     ngaySinh: "09/03/2001",
-//     diaChi: "xã Eatar, huyện Cư M'gar, tỉnh Đăk Lăk",
-//   },
-// ];

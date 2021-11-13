@@ -5,19 +5,26 @@ import Typography from "@mui/material/Typography";
 const Age = (props) => {
   const [maxage, setMaxAge] = React.useState(props.maxAge);
   const [minage, setMinAge] = React.useState(props.minAge);
-
   const selectMaxAgeHandler = (e) => {
     setMaxAge(e.target.value);
+    props.onTSChange({
+      maTS: 7,
+      tenTS: "Độ tuổi tối đa",
+      giaTri: e.target.value,
+    });
   };
   const selectMinAgeHandler = (e) => {
     setMinAge(e.target.value);
+    props.onTSChange({
+      maTS: 6,
+      tenTS: "Độ tuổi tối thiểu",
+      giaTri: e.target.value,
+    });
   };
   return (
     <Grid
       container
       rowSpacing={1.5}
-      sm={12}
-      xs={12}
       justifyContent="space-between"
       padding="0 70px 5px 70px"
       alignItems="center"

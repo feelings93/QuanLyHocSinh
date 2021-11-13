@@ -2,32 +2,16 @@ import axios from "axios";
 import moment from "moment";
 // const FIREBASE_DOMAIN = "https://practice-e56ad-default-rtdb.firebaseio.com";
 
-// const BACKEND_DOMAIN = "http://localhost:8000";
-const BACKEND_DOMAIN = "";
-
-// export async function getAllStudents() {
-//   const response = await fetch(`${FIREBASE_DOMAIN}/students.json`);
-//   const data = await response.json();
-
-//   if (!response.ok) {
-//     throw new Error(data.message || "Could not fetch quotes.");
-//   }
-
-//   const transformedStudents = [];
-
-//   for (const key in data) {
-//     if (data[key]) {
-//       const studentObj = {
-//         id: key,
-//         ...data[key],
-//       };
-
-//       transformedStudents.push(studentObj);
-//     }
-//   }
-
-//   return transformedStudents;
-// }
+const BACKEND_DOMAIN = "http://localhost:8000";
+// const BACKEND_DOMAIN = "";
+const toStr = (arr) => {
+  let res = "";
+  for (let i = 0; i < arr.length; i++) {
+    res += arr[i] + " ";
+  }
+  return res.trim();
+};
+// Học sinh
 export async function getAllStudents() {
   const response = await axios.get(`${BACKEND_DOMAIN}/api/auth/hoc-sinh`, {
     headers: {
@@ -333,7 +317,112 @@ export async function editSubject(request) {
   }
   return data;
 }
+// Bảng điểm
+export async function getAllTranscripts(info) {
+  const response = await axios.get(
+    `${BACKEND_DOMAIN}/api/bang-diem/${info.maHK}/${info.maLop}/${info.maMH}`,
+    {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+    }
+  );
+  const data = await response.data;
+  if (response.status === 401) {
+    throw new Error("Chưa đăng nhập");
+  }
 
+  for (var i = 0; i < data.length; i++) {
+    data[i].id = data[i].maHS;
+    data[i].diemMieng = toStr(data[i].diemMieng);
+    data[i].diem15P = toStr(data[i].diem15P);
+    data[i].diem1Tiet = toStr(data[i].diem1Tiet);
+    data[i].diemHK = toStr(data[i].diemHK);
+  }
+  return data;
+}
+export async function editTranscript(request) {
+  let response;
+  let params = new URLSearchParams();
+  params.append("diemMieng", JSON.stringify(request.diemMieng));
+  params.append("diem15P", JSON.stringify(request.diem15P));
+  params.append("diem1Tiet", JSON.stringify(request.diem1Tiet));
+  params.append("diemHK", JSON.stringify(request.diemHK));
+  params.append("token", localStorage.getItem("accessToken"));
+  if (!request.maBD) {
+    params.append("maMH", JSON.stringify(request.maMH));
+    params.append("maQTH", JSON.stringify(request.maQTH));
+    response = await axios.post(`${BACKEND_DOMAIN}/api/bang-diem`, params, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+  } else {
+    response = await axios.put(
+      `${BACKEND_DOMAIN}/api/bang-diem/${request.maBD}`,
+      params,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+  }
+  const data = await response.data;
+  if (response.status === 401) {
+    throw new Error("Chưa đăng nhập");
+  }
+
+  for (var i = 0; i < data.length; i++) {
+    data[i].id = data[i].maHS;
+  }
+  return data;
+}
+// Tất cả lớp, học kì, môn học
+export async function getAllClassesSemSub() {
+  const response = await axios.get(`${BACKEND_DOMAIN}/api/lop-hk-mh`, {
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("accessToken"),
+    },
+  });
+  const data = await response.data;
+  if (response.status === 401) {
+    throw new Error("Chưa đăng nhập");
+  }
+
+  return data;
+}
+// Tất cả lớp, môn học
+// Tham số
+export async function getAllParams() {
+  const response = await axios.get(`${BACKEND_DOMAIN}/api/tham-so`, {
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("accessToken"),
+    },
+  });
+  const data = await response.data;
+  if (response.status === 401) {
+    throw new Error("Chưa đăng nhập");
+  }
+
+  return data;
+}
+export async function editParams(request) {
+  let params = new URLSearchParams();
+  params.append("thamSo", JSON.stringify(request));
+  const response = await axios.put(`${BACKEND_DOMAIN}/api/tham-so`, params, {
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("accessToken"),
+    },
+  });
+  const data = await response.data;
+  if (response.status === 401) {
+    throw new Error("Chưa đăng nhập");
+  }
+
+  return data;
+}
+// Người dùng
 export async function login(request) {
   var formData = new FormData();
   formData.append("email", request.email);

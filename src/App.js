@@ -13,13 +13,21 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { viVN } from "@mui/material/locale";
 import Users from "./pages/Users";
 import Login from "./pages/Login";
-const Home = React.lazy(() => import("./pages/Home"));
-const Students = React.lazy(() => import("./pages/Students"));
-const Classes = React.lazy(() => import("./pages/Classes"));
-const Courses = React.lazy(() => import("./pages/Courses"));
-const Transcript = React.lazy(() => import("./pages/Transcript"));
-const Statistic = React.lazy(() => import("./pages/Statistic"));
-const Regulation = React.lazy(() => import("./pages/Regulation"));
+import Home from "./pages/Home";
+import Students from "./pages/Students";
+import Classes from "./pages/Classes";
+import Courses from "./pages/Courses";
+import Transcript from "./pages/Transcript";
+import Statistic from "./pages/Statistic";
+import Regulation from "./pages/Regulation";
+
+// const Home = React.lazy(() => import("./pages/Home"));
+// const Students = React.lazy(() => import("./pages/Students"));
+// const Classes = React.lazy(() => import("./pages/Classes"));
+// const Courses = React.lazy(() => import("./pages/Courses"));
+// const Transcript = React.lazy(() => import("./pages/Transcript"));
+// const Statistic = React.lazy(() => import("./pages/Statistic"));
+// const Regulation = React.lazy(() => import("./pages/Regulation"));
 
 const theme = createTheme(
   {

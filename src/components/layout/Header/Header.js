@@ -31,7 +31,7 @@ const Header = (props) => {
               cursor: "pointer",
             }}
           >
-            <Avatar sx={{ mr: "4px" }}>{props.nameUser[0]}</Avatar>
+            <Avatar sx={{ mr: "4px" }}>cc</Avatar>
             <Typography variant="subtitle1" color="inherit" component="div">
               {`Xin chào, ${props.nameUser}`}
             </Typography>

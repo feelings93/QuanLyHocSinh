@@ -42,7 +42,7 @@ const Login = (props) => {
   return (
     <>
       {status === "pending" && <LinearLoading />}
-      <Grid container sm={12} xs={12}>
+      <Grid container>
         <Grid item sm={1}></Grid>
         <Grid container item sm={4} xs={12} alignItems="center">
           <Container fixed>
@@ -102,6 +102,7 @@ const Login = (props) => {
             </form>
           </Container>
         </Grid>
+
         <Grid container item sm={7} xs={12}>
           <Box
             sx={{

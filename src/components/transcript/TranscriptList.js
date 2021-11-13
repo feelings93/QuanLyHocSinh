@@ -12,11 +12,21 @@ import Select from "@mui/material/Select";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import AddLoaiHinhKT from "./AddLoaiHinhKT";
+import useHttp from "../../hooks/use-http";
+import { getAllClassesSemSub } from "../../lib/api";
+import Loading from "../UI/Loading";
 const TranscriptList = () => {
+  const { sendRequest, error, data, status } = useHttp(
+    getAllClassesSemSub,
+    true
+  );
   const [lop, setLop] = React.useState("");
   const [subject, setSubject] = React.useState("");
   const [semester, setSemester] = React.useState("");
-
+  const [isReload, setIsReload] = React.useState(true);
+  React.useEffect(() => {
+    sendRequest();
+  }, [sendRequest]);
   const [isAddLoaiHinhKTDialogVisible, setIsAddLoaiHinhKTDialogVisible] =
     React.useState(false);
   const hideAddLoaiHinhKTHandler = () => {
@@ -27,22 +37,28 @@ const TranscriptList = () => {
   };
   const LopHandleChange = (event) => {
     setLop(event.target.value);
+    setIsReload(true);
   };
   const SubjectHandleChange = (event) => {
     setSubject(event.target.value);
+    setIsReload(true);
   };
   const SemesterHandleChange = (event) => {
     setSemester(event.target.value);
+    setIsReload(true);
   };
+  if (status === "pending") return <Loading />;
+  if (error) return <p>{error}</p>;
+
   return (
     <>
-      <Grid container sm={12} rowSpacing={4}>
+      <Grid container rowSpacing={4}>
         <Grid item sm={12}>
           <Typography variant="h4" component="h2" sx={{ fontWeight: 700 }}>
             Phiếu điểm
           </Typography>
         </Grid>
-        <Grid container item sm={1} sx={{ alignItems: "center" }}>
+        <Grid item sm={1} sx={{ alignItems: "center" }}>
           <Typography variant="h6" component="h6" sx={{ fontSize: "17px" }}>
             Lựa chọn:
           </Typography>
@@ -61,9 +77,11 @@ const TranscriptList = () => {
               type="string"
               onChange={LopHandleChange}
             >
-              <MenuItem value={10}>10A1</MenuItem>
-              <MenuItem value={20}>10A2</MenuItem>
-              <MenuItem value={30}>10A3</MenuItem>
+              {data.lop.map((item) => (
+                <MenuItem key={item.maLop} value={item}>
+                  {item.tenLop}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
           <FormControl
@@ -78,9 +96,11 @@ const TranscriptList = () => {
               label="Môn học"
               onChange={SubjectHandleChange}
             >
-              <MenuItem value={10}>Tin học</MenuItem>
-              <MenuItem value={20}>Hoá học</MenuItem>
-              <MenuItem value={30}>Vật lý</MenuItem>
+              {data.monHoc.map((item) => (
+                <MenuItem key={item.maMH} value={item}>
+                  {item.tenMH}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
           <FormControl size="small" sx={{ minWidth: "150px" }}>
@@ -92,13 +112,15 @@ const TranscriptList = () => {
               label="Học kì"
               onChange={SemesterHandleChange}
             >
-              <MenuItem value={10}>1 (2020-2021)</MenuItem>
-              <MenuItem value={20}>2 (2020-2021)</MenuItem>
-              <MenuItem value={30}>1 (2021-2022)</MenuItem>
+              {data.hocKy.map((item) => (
+                <MenuItem key={item.maHK} value={item}>
+                  {item.tenHK + " " + item.namHoc}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Grid>
-        <Grid container item sm={6} sx={{ justifyContent: "flex-end" }}>
+        <Grid item sm={6} sx={{ justifyContent: "flex-end" }}>
           <TextField
             id="search"
             label="Tìm kiếm"
@@ -130,7 +152,13 @@ const TranscriptList = () => {
             boxShadow: "0px 0px  30px 5px rgba(0, 0, 0, 0.08)",
           }}
         >
-          <TranscriptTable></TranscriptTable>
+          <TranscriptTable
+            isReload={isReload}
+            setIsReload={setIsReload}
+            monHoc={subject}
+            lop={lop}
+            hocKy={semester}
+          />
         </Box>
 
         <AddLoaiHinhKT

@@ -42,7 +42,7 @@ const UsersTable = (props) => {
       renderCell: (params) => {
         return (
           <Chip
-            sx={params.row.dangHoatDong && { color: "#fff" }}
+            sx={params.row.dangHoatDong ? { color: "#fff" } : {}}
             label={
               params.row.dangHoatDong ? "Đang hoạt động" : "Ngưng hoạt động"
             }
