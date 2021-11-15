@@ -39,7 +39,7 @@ const SubjectsTable = (props) => {
         <IconButton
           title="Sửa"
           variant="dark"
-          onClick={props.onShowEdit.bind(null, params.id)}
+          onClick={props.onShowEdit.bind(null, params.row)}
         >
           <EditOutlined />
         </IconButton>

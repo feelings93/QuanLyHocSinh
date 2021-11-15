@@ -18,7 +18,7 @@ const AddCourseForm = (props) => {
       <AddCourseContent
         subjects={props.subjects}
         onClose={props.onClose}
-        onReload={props.onReload}
+        addCourse={props.addCourse}
       />
     </Dialog>
   );
@@ -35,7 +35,7 @@ export const AddCourseContent = (props) => {
           "Bạn đã thêm chương trình học mới thành công",
           "success"
         );
-        props.onReload();
+        props.addCourse({ ...data, id: data.maCTH });
       } else if (error) swal("Đã có lỗi xảy ra", error, "error");
     }
   }, [data, error, status, props]);

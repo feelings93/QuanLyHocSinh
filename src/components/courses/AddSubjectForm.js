@@ -22,7 +22,7 @@ const AddSubjectForm = (props) => {
           "Bạn đã thêm môn học mới thành công",
           "success"
         );
-        props.onReload();
+        props.addSubject({ ...data, id: data.maMH });
       } else if (error) swal("Đã có lỗi xảy ra", error, "error");
     }
   }, [data, error, status, props]);

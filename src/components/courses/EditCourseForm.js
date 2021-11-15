@@ -14,19 +14,6 @@ import LinearLoading from "../UI/LinearLoading";
 const grades = [10, 11, 12];
 const EditCourseForm = (props) => {
   const { sendRequest, status, data, error } = useHttp(editCourse);
-  React.useEffect(() => {
-    if (status === "completed") {
-      props.onClose();
-      if (data) {
-        swal(
-          "Cập nhật thành công!",
-          "Bạn đã cập nhật chương trình học thành công",
-          "success"
-        );
-        props.onReload();
-      } else if (error) swal("Đã có lỗi xảy ra", error, "error");
-    }
-  }, [data, error, status, props]);
   const [subject, setSubject] = React.useState(props.editCourse.tenMH);
   const selectSubjectHandler = (event) => {
     setSubject(event.target.value);
@@ -39,6 +26,24 @@ const EditCourseForm = (props) => {
   const heSoChangeHandler = (event) => {
     setHeSo(event.target.value);
   };
+  React.useEffect(() => {
+    if (status === "completed") {
+      props.onClose();
+      if (data) {
+        swal(
+          "Cập nhật thành công!",
+          "Bạn đã cập nhật chương trình học thành công",
+          "success"
+        );
+        props.updateCourse({
+          ...props.editCourse,
+          heSo: heSo,
+          id: props.editCourse.maCTH,
+        });
+      } else if (error) swal("Đã có lỗi xảy ra", error, "error");
+    }
+  }, [data, error, status, props, heSo]);
+
   const editCourseSubmitHandler = (event) => {
     event.preventDefault();
     let request = {

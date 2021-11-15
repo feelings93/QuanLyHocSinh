@@ -15,13 +15,15 @@ import Loading from "../UI/Loading";
 import BackdropLoading from "../UI/BackdropLoading";
 const CoursesList = () => {
   const { sendRequest, data, status, error } = useHttp(getAllCourses, true);
-  const [isReload, setIsReload] = React.useState(true);
   React.useEffect(() => {
-    if (isReload === true) {
-      sendRequest();
-      setIsReload(false);
+    sendRequest();
+  }, [sendRequest]);
+  React.useEffect(() => {
+    if (status === "completed" && data) {
+      setAllCourses(data);
+      console.log(data);
     }
-  }, [sendRequest, isReload]);
+  }, [data, status]);
   const history = useHistory();
   const { url } = useRouteMatch();
   const [isAddCourseDialogVisible, setIsAddCourseDialogVisible] =
@@ -29,7 +31,18 @@ const CoursesList = () => {
   const [isEditCourseDialogVisible, setIsEditCourseDialogVisible] =
     React.useState(false);
   const [editCourse, setEditCourse] = React.useState(null);
-
+  const [allCourses, setAllCourses] = React.useState([]);
+  const updateCourse = (course) => {
+    let newCourses = allCourses.map((x) =>
+      x.maCTH !== course.maCTH ? x : course
+    );
+    setAllCourses(newCourses);
+  };
+  const addCourse = (course) => {
+    let newCourses = [...allCourses];
+    newCourses.push(course);
+    setAllCourses(newCourses);
+  };
   const showAddCourseHandler = () => {
     setIsAddCourseDialogVisible(true);
   };
@@ -88,7 +101,7 @@ const CoursesList = () => {
         }}
       >
         <Grid item xs={12}>
-          <CoursesTable onShowEdit={showEditCourseHandler} data={data} />
+          <CoursesTable onShowEdit={showEditCourseHandler} data={allCourses} />
         </Grid>
       </Grid>
       <CoursesDialog
@@ -97,9 +110,8 @@ const CoursesList = () => {
         openEdit={isEditCourseDialogVisible}
         onCloseEdit={hideEditCourseHandler}
         editCourse={editCourse}
-        onReload={() => {
-          setIsReload(true);
-        }}
+        updateCourse={updateCourse}
+        addCourse={addCourse}
       />
     </>
   );
@@ -119,19 +131,19 @@ const CoursesDialog = (props) => {
     <>
       {props.openAdd && (
         <AddCourseForm
+          addCourse={props.addCourse}
           subjects={data}
           open={props.openAdd}
           onClose={props.onCloseAdd}
-          onReload={props.onReload}
         />
       )}
       {props.openEdit && (
         <EditCourseForm
+          updateCourse={props.updateCourse}
           editCourse={props.editCourse}
           subjects={data}
           open={props.openEdit}
           onClose={props.onCloseEdit}
-          onReload={props.onReload}
         />
       )}
     </>
