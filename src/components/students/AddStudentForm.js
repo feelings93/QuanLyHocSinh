@@ -1,22 +1,26 @@
 import React from "react";
-
-import Paper from "@mui/material/Paper";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import Stack from "@mui/material/Stack";
+import DialogTitle from "@mui/material/DialogTitle";
+import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+
 import FormControl from "@mui/material/FormControl";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import useHttp from "../../hooks/use-http";
 import { addStudent } from "../../lib/api";
-import InputLabel from "@mui/material/InputLabel";
-import Typography from "@mui/material/Typography";
-import TextField from "@mui/material/TextField";
 
 import DatePicker from "@mui/lab/DatePicker";
 import { useForm, Controller } from "react-hook-form";
 import swal from "sweetalert";
+import LinearLoading from "../UI/LinearLoading";
 const AddStudentForm = (props) => {
   const { sendRequest, status, data, error } = useHttp(addStudent);
+
   const { control, handleSubmit } = useForm();
   const submitFormHandler = (data) => {
     sendRequest(data);
@@ -24,92 +28,107 @@ const AddStudentForm = (props) => {
   React.useEffect(() => {
     if (status === "completed") {
       if (data) {
+        props.onClose();
+
         swal(
           "Thêm thành công!",
           "Bạn đã thêm  học sinh mới thành công",
           "success"
         );
+        props.addStudent({ ...data, id: data.maHS });
       } else if (error) swal("Đã có lỗi xảy ra", error, "error");
     }
   }, [data, error, status, props]);
   return (
-    <Paper elevation={4} sx={{ padding: "16px" }}>
-      <Typography mb="16px" variant="h6" sx={{ fontSize: "18px" }}>
-        Thêm học sinh
-      </Typography>
+    <Dialog open={props.open} onClose={props.onClose}>
       <form onSubmit={handleSubmit(submitFormHandler)}>
-        <InputLabel mb="8px" htmlFor="name-input">
-          Họ và tên
-        </InputLabel>
-        <Controller
-          name="hoTen"
-          control={control}
-          defaultValue=""
-          render={({ field }) => (
-            <TextField
-              {...field}
-              required
-              fullWidth
-              id="name-input"
-              variant="outlined"
-            />
-          )}
-        ></Controller>
+        {status === "pending" && <LinearLoading />}
+        <DialogTitle>Thêm chương trình học</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2} sx={{ width: "300px" }}>
+            <Controller
+              name="hoTen"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  margin="dense"
+                  label="Họ tên"
+                  required
+                  fullWidth
+                  id="name-input"
+                  variant="outlined"
+                />
+              )}
+            ></Controller>
 
-        <InputLabel mb="8px">Giới tính</InputLabel>
-        <Controller
-          name="gioiTinh"
-          control={control}
-          defaultValue="Nam"
-          render={({ field }) => (
-            <FormControl {...field} component="fieldset">
-              <RadioGroup
-                aria-label="gender"
-                defaultValue="Nam"
-                name="radio-buttons-group"
-              >
-                <FormControlLabel value="Nam" control={<Radio />} label="Nam" />
-                <FormControlLabel value="Nữ" control={<Radio />} label="Nữ" />
-              </RadioGroup>
-            </FormControl>
-          )}
-        ></Controller>
-        <InputLabel>Ngày sinh</InputLabel>
+            <Controller
+              name="gioiTinh"
+              control={control}
+              defaultValue="Nam"
+              render={({ field }) => (
+                <FormControl {...field} component="fieldset">
+                  <RadioGroup
+                    aria-label="gender"
+                    defaultValue="Nam"
+                    name="radio-buttons-group"
+                  >
+                    <FormControlLabel
+                      value="Nam"
+                      control={<Radio />}
+                      label="Nam"
+                    />
+                    <FormControlLabel
+                      value="Nữ"
+                      control={<Radio />}
+                      label="Nữ"
+                    />
+                  </RadioGroup>
+                </FormControl>
+              )}
+            ></Controller>
 
-        <Controller
-          name="ngaySinh"
-          control={control}
-          defaultValue=""
-          render={({ field }) => <BasicDatePicker {...field} />}
-        ></Controller>
+            <Controller
+              name="ngaySinh"
+              margin="dense"
+              label="Ngày sinh"
+              control={control}
+              defaultValue=""
+              render={({ field }) => <BasicDatePicker {...field} />}
+            ></Controller>
 
-        <InputLabel htmlFor="address-input">Địa chỉ</InputLabel>
-        <Controller
-          name="diaChi"
-          control={control}
-          defaultValue=""
-          render={({ field }) => (
-            <TextField
-              {...field}
-              required
-              fullWidth
-              id="address-input"
-              variant="outlined"
-            />
-          )}
-        ></Controller>
+            <Controller
+              name="diaChi"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  required
+                  label="Địa chỉ"
+                  margin="dense"
+                  fullWidth
+                  id="address-input"
+                  variant="outlined"
+                />
+              )}
+            ></Controller>
+          </Stack>
+        </DialogContent>
 
-        <Button
-          disabled={status === "pending"}
-          color="success"
-          sx={{ marginTop: "16px" }}
-          type="submit"
-          variant="contained"
-        >
-          {status === "pending" ? "Đang thêm..." : "Thêm"}
-        </Button>
+        <DialogActions>
+          <Button
+            disabled={status === "pending"}
+            type="submit"
+            variant="contained"
+          >
+            {status === "pending" ? "Đang thêm..." : "Thêm"}
+          </Button>
+          <Button onClick={props.onClose}>Hủy bỏ</Button>
+        </DialogActions>
       </form>
-    </Paper>
+    </Dialog>
   );
 };
 const BasicDatePicker = React.forwardRef((props, ref) => {
@@ -121,9 +140,12 @@ const BasicDatePicker = React.forwardRef((props, ref) => {
   return (
     <DatePicker
       inputFormat="DD/MM/yyyy"
+      label="Ngày sinh"
       value={value}
       onChange={setNewValueHandler}
-      renderInput={(params) => <TextField required {...params} />}
+      renderInput={(params) => (
+        <TextField margin="dense" required {...params} />
+      )}
     />
   );
 });

@@ -23,7 +23,8 @@ const TranscriptList = () => {
   const [lop, setLop] = React.useState("");
   const [subject, setSubject] = React.useState("");
   const [semester, setSemester] = React.useState("");
-  const [isReload, setIsReload] = React.useState(true);
+  const [query, setQuery] = React.useState("");
+
   React.useEffect(() => {
     sendRequest();
   }, [sendRequest]);
@@ -37,15 +38,12 @@ const TranscriptList = () => {
   };
   const LopHandleChange = (event) => {
     setLop(event.target.value);
-    setIsReload(true);
   };
   const SubjectHandleChange = (event) => {
     setSubject(event.target.value);
-    setIsReload(true);
   };
   const SemesterHandleChange = (event) => {
     setSemester(event.target.value);
-    setIsReload(true);
   };
   if (status === "pending") return <Loading />;
   if (error) return <p>{error}</p>;
@@ -123,6 +121,10 @@ const TranscriptList = () => {
         <Grid item sm={6} sx={{ justifyContent: "flex-end" }}>
           <TextField
             id="search"
+            value={query}
+            onChange={(event) => {
+              setQuery(event.target.value);
+            }}
             label="Tìm kiếm"
             variant="outlined"
             size="small"
@@ -153,8 +155,7 @@ const TranscriptList = () => {
           }}
         >
           <TranscriptTable
-            isReload={isReload}
-            setIsReload={setIsReload}
+            query={query}
             monHoc={subject}
             lop={lop}
             hocKy={semester}

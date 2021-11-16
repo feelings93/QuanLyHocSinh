@@ -1,18 +1,24 @@
 import React from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
-import { DeleteOutlined, EditOutlined } from "@mui/icons-material";
-import { useHistory, useRouteMatch } from "react-router-dom";
+import {
+  DeleteOutlined,
+  DetailsOutlined,
+  EditOutlined,
+} from "@mui/icons-material";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
+import { useRouteMatch, useHistory } from "react-router-dom";
+
 const StudentsTable = (props) => {
   const history = useHistory();
   const { url } = useRouteMatch();
+  const moveToProfileHandler = (id) => {
+    history.push(`${url}/profile/${id}`);
+  };
   const [pageSize, setPageSize] = React.useState(5);
   const [selectedList, setSelectedList] = React.useState([]);
-  const moveToEditHandler = (id) => {
-    history.push(`${url}/${id}`);
-  };
+
   const deleteStudentsHandler = () => {
     console.log(selectedList);
   };
@@ -33,9 +39,26 @@ const StudentsTable = (props) => {
         <IconButton
           title="Sửa"
           variant="dark"
-          onClick={moveToEditHandler.bind(null, params.id)}
+          onClick={props.onShowEdit.bind(null, params.row)}
         >
           <EditOutlined />
+        </IconButton>
+      ),
+    },
+    {
+      field: "profile",
+      headerName: "Học bạ",
+      headerAlign: "center",
+      sortable: false,
+      align: "center",
+      width: 150,
+      renderCell: (params) => (
+        <IconButton
+          title="Học bạ"
+          variant="dark"
+          onClick={moveToProfileHandler.bind(null, params.id)}
+        >
+          <DetailsOutlined />
         </IconButton>
       ),
     },

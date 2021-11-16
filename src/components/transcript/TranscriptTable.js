@@ -16,34 +16,36 @@ const TranscriptTable = (props) => {
   const [editRowsModel, setEditRowsModel] = React.useState({});
   const [editTranscript, setEditTranscript] = React.useState({});
   const [bangDiem, setBangDiem] = React.useState([]);
-
+  const [searchBD, setSearchBD] = React.useState([]);
+  const updateTranscript = (data) => {
+    let newDatas = bangDiem.map((x) => (x.maHS !== data.maHS ? x : data));
+    setBangDiem(newDatas);
+  };
   useEffect(() => {
-    if (
-      props.lop !== "" &&
-      props.hocKy !== "" &&
-      props.monHoc &&
-      props.isReload
-    ) {
+    if (props.lop !== "" && props.hocKy !== "" && props.monHoc) {
       sendRequest({
         maHK: props.hocKy.maHK,
         maMH: props.monHoc.maMH,
         maLop: props.lop.maLop,
       });
-      props.setIsReload(false);
     }
-  }, [
-    props.isReload,
-    props.hocKy,
-    props.lop,
-    props.monHoc,
-    sendRequest,
-    props,
-  ]);
+  }, [props.hocKy, props.lop, props.monHoc, sendRequest]);
   useEffect(() => {
     if (status === "completed" && data) {
       setBangDiem(data);
     }
   }, [data, status]);
+  useEffect(() => {
+    if (props.query === "" || !props.query) {
+      setSearchBD(bangDiem);
+    } else {
+      setSearchBD(
+        bangDiem.filter((x) =>
+          x.hoTen.toUpperCase().includes(props.query.toUpperCase())
+        )
+      );
+    }
+  }, [bangDiem, props.query]);
   const handleEditRowsModelChange = React.useCallback((model) => {
     setEditRowsModel(model);
     //alert(JSON.stringify(model[0]));
@@ -151,7 +153,7 @@ const TranscriptTable = (props) => {
         disableColumnMenu
         disableSelectionOnClick
         //  checkboxSelection
-        rows={bangDiem}
+        rows={searchBD}
         rowsPerPageOptions={[5, 10, 20]}
         columns={columns}
         editMode="row"
@@ -163,9 +165,7 @@ const TranscriptTable = (props) => {
 
       {isEditDiemDialogVisible && (
         <EditDiem
-          onReload={() => {
-            props.setIsReload(true);
-          }}
+          updateTranscript={updateTranscript}
           editTranscript={editTranscript}
           open={isEditDiemDialogVisible}
           onClose={hideEditDiemHandler}

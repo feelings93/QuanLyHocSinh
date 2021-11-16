@@ -33,6 +33,14 @@ const isValidScoreArray = (str) => {
 };
 const EditDiem = (props) => {
   const { sendRequest, status, data, error } = useHttp(editTranscript);
+  const [diemMieng, setDiemMieng] = React.useState(
+    props.editTranscript.diemMieng
+  );
+  const [diem15P, setDiem15P] = React.useState(props.editTranscript.diem15P);
+  const [diem1Tiet, setDiem1Tiet] = React.useState(
+    props.editTranscript.diem1Tiet
+  );
+  const [diemHK, setDiemHK] = React.useState(props.editTranscript.diemHK);
   React.useEffect(() => {
     if (status === "completed") {
       props.onClose();
@@ -42,10 +50,19 @@ const EditDiem = (props) => {
           "Bạn đã cập nhật bảng điểm thành công",
           "success"
         );
-        props.onReload();
+        props.updateTranscript({
+          ...props.editTranscript,
+          id: props.editTranscript.maHS,
+          diemMieng: diemMieng,
+          diem15P: diem15P,
+          diem1Tiet: diem1Tiet,
+          diemHK: diemHK,
+          maBD: data.maBD,
+          diemTBM: data.diemTBM,
+        });
       } else if (error) swal("Đã có lỗi xảy ra", error, "error");
     }
-  }, [data, error, status, props]);
+  }, [data, error, status, props, diemMieng, diem15P, diem1Tiet, diemHK]);
   const editTranscriptSubmitHandler = (event) => {
     event.preventDefault();
     if (!isValidScoreArray(diemMieng)) {
@@ -83,14 +100,7 @@ const EditDiem = (props) => {
       maMH: props.editTranscript.maMH,
     });
   };
-  const [diemMieng, setDiemMieng] = React.useState(
-    props.editTranscript.diemMieng
-  );
-  const [diem15P, setDiem15P] = React.useState(props.editTranscript.diem15P);
-  const [diem1Tiet, setDiem1Tiet] = React.useState(
-    props.editTranscript.diem1Tiet
-  );
-  const [diemHK, setDiemHK] = React.useState(props.editTranscript.diemHK);
+
   return (
     <Dialog open={props.open} onClose={props.onClose}>
       {status === "pending" && <LinearLoading />}
