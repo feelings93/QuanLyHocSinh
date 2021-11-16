@@ -14,16 +14,28 @@ import { editStudent } from "../../lib/api";
 import DatePicker from "@mui/lab/DatePicker";
 import { useForm, Controller } from "react-hook-form";
 import moment from "moment";
+import swal from "sweetalert";
+import LinearLoading from "../UI/LinearLoading";
 const EditStudentForm = (props) => {
   const { student } = props;
   const { control, handleSubmit } = useForm();
-  const { sendRequest, status, error } = useHttp(editStudent);
+  const { sendRequest, status, error, data } = useHttp(editStudent);
   const submitFormHandler = (data) => {
     let request = { ...student, ...data };
     console.log(request);
     sendRequest(request);
   };
-  if (error) alert(error);
+  React.useEffect(() => {
+    if (status === "completed") {
+      if (data) {
+        swal(
+          "Cập nhật thành công!",
+          "Bạn đã cập nhật thông tin học sinh thành công",
+          "success"
+        );
+      } else if (error) swal("Đã có lỗi xảy ra", error, "error");
+    }
+  }, [data, error, status, props]);
   return (
     <Paper elevation={4} sx={{ padding: "16px" }}>
       <Typography mb="16px" variant="h6" sx={{ fontSize: "18px" }}>
@@ -99,6 +111,7 @@ const EditStudentForm = (props) => {
           {status === "pending" ? "Đang cập nhật..." : "Cập nhật"}
         </Button>
       </form>
+      {status === "pending" && <LinearLoading />}
     </Paper>
   );
 };

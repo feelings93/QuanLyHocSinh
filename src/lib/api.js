@@ -13,33 +13,37 @@ const toStr = (arr) => {
 };
 // Học sinh
 export async function getAllStudents() {
-  const response = await axios.get(`${BACKEND_DOMAIN}/api/auth/hoc-sinh`, {
-    headers: {
-      Authorization: "Bearer " + localStorage.getItem("accessToken"),
-    },
-  });
-  const data = await response.data;
-  if (response.status === 401) {
-    throw new Error("Chưa đăng nhập");
+  try {
+    const response = await axios.get(`${BACKEND_DOMAIN}/api/auth/hoc-sinh`, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+    });
+    const data = await response.data;
+
+    for (var i = 0; i < data.length; i++) {
+      data[i].id = data[i].maHS;
+    }
+    return data;
+  } catch (error) {
+    window.location.reload();
   }
-  for (var i = 0; i < data.length; i++) {
-    data[i].id = data[i].maHS;
-  }
-  return data;
 }
 export async function getStudentById(id) {
-  const response = await axios.get(`${BACKEND_DOMAIN}/api/hoc-sinh/${id}`, {
-    headers: {
-      Authorization: "Bearer " + localStorage.getItem("accessToken"),
-    },
-  });
+  try {
+    const response = await axios.get(`${BACKEND_DOMAIN}/api/hoc-sinh/${id}`, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+    });
 
-  const data = await response.data;
-
-  if (response.status === 401) {
-    throw new Error(data.message || "Not auth");
+    const data = await response.data;
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
   }
-  return data;
 }
 export async function addStudent(request) {
   var formData = new FormData();
@@ -51,41 +55,62 @@ export async function addStudent(request) {
   );
   formData.append("diaChi", request.diaChi);
   formData.append("token", localStorage.getItem("accessToken"));
-  const response = await axios.post(
-    `${BACKEND_DOMAIN}/api/hoc-sinh`,
+  try {
+    const response = await axios.post(
+      `${BACKEND_DOMAIN}/api/hoc-sinh`,
 
-    formData
-  );
-  const data = await response.data;
+      formData
+    );
+    const data = await response.data;
 
-  if (response.status === 401) {
-    throw new Error(data.message || "Not auth.");
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
+    if (error.response.status === 422) {
+      throw new Error(
+        error.response.data.message ||
+          "Vui lòng kiểm tra thông tin các trường đã nhập"
+      );
+    }
   }
-
-  return data;
 }
 
 export async function editStudent(request) {
-  var formData = new FormData();
-  formData.append("hoTen", request.hoTen);
-  formData.append("gioiTinh", request.gioiTinh);
-  formData.append(
+  var params = new URLSearchParams();
+  params.append("hoTen", request.hoTen);
+  params.append("gioiTinh", request.gioiTinh);
+  params.append(
     "ngaySinh",
     moment(request.ngaySinh, "DD/MM/YYYY").format("YYYY-MM-DD")
   );
-  formData.append("diaChi", request.diaChi);
-  formData.append("token", localStorage.getItem("accessToken"));
-  const response = await axios.put(
-    `${BACKEND_DOMAIN}/api/hoc-sinh/${request.maHS}`,
-    formData
-  );
-  const data = await response.data;
+  params.append("diaChi", request.diaChi);
+  params.append("token", localStorage.getItem("accessToken"));
+  try {
+    const response = await axios.put(
+      `${BACKEND_DOMAIN}/api/hoc-sinh/${request.maHS}`,
+      params,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    const data = await response.data;
 
-  if (response.status === 401) {
-    throw new Error(data.message || "Not auth.");
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
+    if (error.response.status === 422) {
+      throw new Error(
+        error.response.data.message ||
+          "Vui lòng kiểm tra thông tin các trường đã nhập"
+      );
+    }
   }
-
-  return data;
 }
 // Lớp
 export async function getAllClasses() {
@@ -94,14 +119,18 @@ export async function getAllClasses() {
       Authorization: "Bearer " + localStorage.getItem("accessToken"),
     },
   });
-  const data = await response.data;
-  if (response.status === 401) {
-    throw new Error("Chưa đăng nhập");
+  try {
+    const data = await response.data;
+
+    for (var i = 0; i < data.length; i++) {
+      data[i].id = data[i].maLop;
+    }
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
   }
-  for (var i = 0; i < data.length; i++) {
-    data[i].id = data[i].maLop;
-  }
-  return data;
 }
 
 export async function addClass(request) {
@@ -109,107 +138,122 @@ export async function addClass(request) {
   formData.append("tenLop", request.tenLop);
   formData.append("maKhoi", request.maKhoi);
   formData.append("token", localStorage.getItem("accessToken"));
-  const response = await axios.post(`${BACKEND_DOMAIN}/api/lop`, formData);
-  const data = await response.data;
+  try {
+    const response = await axios.post(`${BACKEND_DOMAIN}/api/lop`, formData);
+    const data = await response.data;
 
-  if (response.status === 401) {
-    throw new Error(data.message || "Not auth.");
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
   }
-  return data;
 }
 export async function getClassesById(id) {
-  const response = await axios.get(
-    `${BACKEND_DOMAIN}/api/lop/${id[0]}/${id[1]}`,
-    {
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
+  try {
+    const response = await axios.get(
+      `${BACKEND_DOMAIN}/api/lop/${id[0]}/${id[1]}`,
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+      }
+    );
+    const data = await response.data;
+    for (var i = 0; i < data.hocSinh.length; i++) {
+      data.hocSinh[i].id = data.hocSinh[i].maHS;
     }
-  );
-  const data = await response.data;
-  if (response.status === 401) {
-    throw new Error("Chưa đăng nhập");
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
   }
-  for (var i = 0; i < data.hocSinh.length; i++) {
-    data.hocSinh[i].id = data.hocSinh[i].maHS;
-  }
-  return data;
 }
 export async function getStudentsEmpty(id) {
-  const response = await axios.get(
-    `${BACKEND_DOMAIN}/api/hoc-sinh-trong/${id}`,
-    {
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
+  try {
+    const response = await axios.get(
+      `${BACKEND_DOMAIN}/api/hoc-sinh-trong/${id}`,
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+      }
+    );
+    const data = await response.data;
+    for (var i = 0; i < data.length; i++) {
+      data[i].id = data[i].maHS;
     }
-  );
-  const data = await response.data;
-  if (response.status === 401) {
-    throw new Error("Chưa đăng nhập");
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
   }
-  for (var i = 0; i < data.length; i++) {
-    data[i].id = data[i].maHS;
-  }
-  return data;
 }
 export async function addStudentsToClass(request) {
   var params = new URLSearchParams();
   params.append("maHS", JSON.stringify(request.maHS));
   params.append("token", localStorage.getItem("accessToken"));
-  const response = await axios.post(
-    `${BACKEND_DOMAIN}/api/lop/${request.maLop}/${request.maHK}`,
-    params,
-    {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
+  try {
+    const response = await axios.post(
+      `${BACKEND_DOMAIN}/api/lop/${request.maLop}/${request.maHK}`,
+      params,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    const data = await response.data;
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập.");
     }
-  );
-  const data = await response.data;
-
-  if (response.status === 401) {
-    throw new Error(data.message || "Not auth.");
   }
-  return data;
 }
 
 export async function delStudentsFromClass(request) {
   var params = new URLSearchParams();
   params.append("maHS", JSON.stringify(request.maHS));
   params.append("token", localStorage.getItem("accessToken"));
-  const response = await axios.post(
-    `${BACKEND_DOMAIN}/api/lop/xoa-hoc-sinh/${request.maLop}/${request.maHK}`,
-    params,
-    {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
+  try {
+    const response = await axios.post(
+      `${BACKEND_DOMAIN}/api/lop/xoa-hoc-sinh/${request.maLop}/${request.maHK}`,
+      params,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    const data = await response.data;
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Not auth.");
     }
-  );
-  const data = await response.data;
-
-  if (response.status === 401) {
-    throw new Error(data.message || "Not auth.");
   }
-  return data;
 }
 // Chương trình học
 export async function getAllCourses() {
-  const response = await axios.get(`${BACKEND_DOMAIN}/api/cth`, {
-    headers: {
-      Authorization: "Bearer " + localStorage.getItem("accessToken"),
-    },
-  });
-  const data = await response.data;
-  if (response.status === 401) {
-    throw new Error("Chưa đăng nhập");
+  try {
+    const response = await axios.get(`${BACKEND_DOMAIN}/api/cth`, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+    });
+    const data = await response.data;
+    for (var i = 0; i < data.length; i++) {
+      data[i].id = data[i].maCTH;
+    }
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error("Chưa đăng nhập");
+    }
   }
-
-  for (var i = 0; i < data.length; i++) {
-    data[i].id = data[i].maCTH;
-  }
-  return data;
 }
 export async function addCourse(request) {
   var params = new URLSearchParams();
@@ -217,17 +261,24 @@ export async function addCourse(request) {
   params.append("maKhoi", request.maKhoi);
   params.append("heSo", request.heSo);
   params.append("token", localStorage.getItem("accessToken"));
-  const response = await axios.post(`${BACKEND_DOMAIN}/api/cth`, params, {
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-  });
-  const data = await response.data;
-
-  if (response.status === 401) {
-    throw new Error(data.message || "Not auth.");
+  try {
+    const response = await axios.post(`${BACKEND_DOMAIN}/api/cth`, params, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+    const data = await response.data;
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
+    if (error.response.status === 422) {
+      throw new Error(
+        error.response.data.message || "Các trường bị sai thông tin"
+      );
+    }
   }
-  return data;
 }
 export async function editCourse(request) {
   var params = new URLSearchParams();
@@ -235,38 +286,47 @@ export async function editCourse(request) {
   params.append("maKhoi", request.maKhoi);
   params.append("heSo", request.heSo);
   params.append("token", localStorage.getItem("accessToken"));
-  const response = await axios.put(
-    `${BACKEND_DOMAIN}/api/cth/${request.maCTH}`,
-    params,
-    {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
+  try {
+    const response = await axios.put(
+      `${BACKEND_DOMAIN}/api/cth/${request.maCTH}`,
+      params,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    const data = await response.data;
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
     }
-  );
-  const data = await response.data;
-
-  if (response.status === 401) {
-    throw new Error(data.message || "Not auth.");
+    if (error.response.status === 422) {
+      throw new Error(
+        error.response.data.message || "Các trường bị sai thông tin"
+      );
+    }
   }
-  return data;
 }
 //  Môn học
 export async function getAllSubjects() {
-  const response = await axios.get(`${BACKEND_DOMAIN}/api/mon-hoc`, {
-    headers: {
-      Authorization: "Bearer " + localStorage.getItem("accessToken"),
-    },
-  });
-  const data = await response.data;
-  if (response.status === 401) {
-    throw new Error("Chưa đăng nhập");
+  try {
+    const response = await axios.get(`${BACKEND_DOMAIN}/api/mon-hoc`, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+    });
+    const data = await response.data;
+    for (var i = 0; i < data.length; i++) {
+      data[i].id = data[i].maMH;
+    }
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
   }
-
-  for (var i = 0; i < data.length; i++) {
-    data[i].id = data[i].maMH;
-  }
-  return data;
 }
 
 export async function addSubject(request) {
@@ -274,13 +334,26 @@ export async function addSubject(request) {
   formData.append("tenMH", request.tenMH);
   formData.append("diemDat", request.diemDat);
   formData.append("token", localStorage.getItem("accessToken"));
-  const response = await axios.post(`${BACKEND_DOMAIN}/api/mon-hoc`, formData);
-  const data = await response.data;
-
-  if (response.status === 401) {
-    throw new Error(data.message || "Not auth.");
+  try {
+    const response = await axios.post(
+      `${BACKEND_DOMAIN}/api/mon-hoc`,
+      formData
+    );
+    const data = await response.data;
+    return data;
+  } catch (error) {
+    if (error.response) {
+    }
+    console.log(error.response);
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Not auth.");
+    }
+    if (error.response.status === 422) {
+      throw new Error(
+        error.response.data.message || "Các trường bị sai thông tin"
+      );
+    }
   }
-  return data;
 }
 
 export async function getSubjectById(id) {
@@ -301,21 +374,28 @@ export async function editSubject(request) {
   params.append("tenMH", request.tenMH);
   params.append("diemDat", request.diemDat);
   params.append("token", localStorage.getItem("accessToken"));
-  const response = await axios.put(
-    `${BACKEND_DOMAIN}/api/mon-hoc/${request.maMH}`,
-    params,
-    {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
+  try {
+    const response = await axios.put(
+      `${BACKEND_DOMAIN}/api/mon-hoc/${request.maMH}`,
+      params,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    const data = await response.data;
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
     }
-  );
-  const data = await response.data;
-
-  if (response.status === 401) {
-    throw new Error(data.message || "Not auth.");
+    if (error.response.status === 422) {
+      throw new Error(
+        error.response.data.message || "Các trường bị sai thông tin"
+      );
+    }
   }
-  return data;
 }
 // Bảng điểm
 export async function getAllTranscripts(info) {
@@ -427,27 +507,37 @@ export async function login(request) {
   var formData = new FormData();
   formData.append("email", request.email);
   formData.append("password", request.password);
-  const response = await axios.post(
-    `${BACKEND_DOMAIN}/api/auth/login`,
-    formData
-  );
-  const data = await response.data;
-  if (response.status === 401) {
-    throw new Error("Thông tin đăng nhập không chính xác");
-  } else if (response.status !== 200) {
-    throw new Error("Đã có lỗi xảy ra");
+  try {
+    const response = await axios.post(
+      `${BACKEND_DOMAIN}/api/auth/login`,
+      formData
+    );
+    const data = await response.data;
+    return data;
+  } catch (error) {
+    console.log(error);
+    if (error.response.status === 401) {
+      throw new Error(
+        error.respone.data.message || "Thông tin đăng nhập không chính xác"
+      );
+    }
   }
-  return data;
 }
 export async function getUser(request) {
   var formData = new FormData();
   formData.append("token", localStorage.getItem("accessToken"));
-  const response = await axios.post(`${BACKEND_DOMAIN}/api/auth/me`, formData);
-  const data = await response.data;
-  if (response.status === 401) {
-    throw new Error("Cần đăng nhập để sử dụng");
-  } else if (response.status !== 200) {
-    throw new Error("Đã có lỗi xảy ra");
+  try {
+    const response = await axios.post(
+      `${BACKEND_DOMAIN}/api/auth/me`,
+      formData
+    );
+    const data = await response.data;
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(
+        error.response.data.message || "Cần đăng nhập để sử dụng"
+      );
+    }
   }
-  return data;
 }

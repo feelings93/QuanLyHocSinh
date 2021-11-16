@@ -14,12 +14,24 @@ import TextField from "@mui/material/TextField";
 
 import DatePicker from "@mui/lab/DatePicker";
 import { useForm, Controller } from "react-hook-form";
-const AddStudentForm = () => {
-  const { sendRequest, status } = useHttp(addStudent);
+import swal from "sweetalert";
+const AddStudentForm = (props) => {
+  const { sendRequest, status, data, error } = useHttp(addStudent);
   const { control, handleSubmit } = useForm();
   const submitFormHandler = (data) => {
     sendRequest(data);
   };
+  React.useEffect(() => {
+    if (status === "completed") {
+      if (data) {
+        swal(
+          "Thêm thành công!",
+          "Bạn đã thêm  học sinh mới thành công",
+          "success"
+        );
+      } else if (error) swal("Đã có lỗi xảy ra", error, "error");
+    }
+  }, [data, error, status, props]);
   return (
     <Paper elevation={4} sx={{ padding: "16px" }}>
       <Typography mb="16px" variant="h6" sx={{ fontSize: "18px" }}>
@@ -36,6 +48,7 @@ const AddStudentForm = () => {
           render={({ field }) => (
             <TextField
               {...field}
+              required
               fullWidth
               id="name-input"
               variant="outlined"
@@ -78,6 +91,7 @@ const AddStudentForm = () => {
           render={({ field }) => (
             <TextField
               {...field}
+              required
               fullWidth
               id="address-input"
               variant="outlined"
@@ -109,7 +123,7 @@ const BasicDatePicker = React.forwardRef((props, ref) => {
       inputFormat="DD/MM/yyyy"
       value={value}
       onChange={setNewValueHandler}
-      renderInput={(params) => <TextField {...params} />}
+      renderInput={(params) => <TextField required {...params} />}
     />
   );
 });

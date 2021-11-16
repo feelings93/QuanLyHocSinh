@@ -72,6 +72,7 @@ const EditSubjectContent = (props) => {
       <DialogContent>
         <Stack spacing={2} sx={{ width: "200px" }}>
           <TextField
+            required
             value={enteredSubject}
             onChange={subjectChangeHandler}
             autoFocus
@@ -82,6 +83,7 @@ const EditSubjectContent = (props) => {
             variant="outlined"
           />
           <TextField
+            required
             value={enteredPoint}
             onChange={pointChangeHandler}
             margin="dense"

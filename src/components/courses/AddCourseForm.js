@@ -68,6 +68,7 @@ export const AddCourseContent = (props) => {
       <DialogContent>
         <Stack spacing={2} sx={{ width: "300px" }}>
           <TextField
+            required
             autoFocus
             id="subject"
             select
@@ -83,6 +84,7 @@ export const AddCourseContent = (props) => {
             ))}
           </TextField>
           <TextField
+            required
             id="grade"
             select
             margin="dense"
@@ -97,6 +99,7 @@ export const AddCourseContent = (props) => {
             ))}
           </TextField>
           <TextField
+            required
             value={heSo}
             margin="dense"
             id="coefficient"

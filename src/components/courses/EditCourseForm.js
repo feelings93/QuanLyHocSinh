@@ -93,6 +93,7 @@ const EditCourseForm = (props) => {
               ))}
             </TextField>
             <TextField
+              required
               value={heSo}
               margin="dense"
               id="coefficient"

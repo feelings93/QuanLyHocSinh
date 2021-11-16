@@ -45,6 +45,7 @@ const AddSubjectForm = (props) => {
         <DialogContent>
           <Stack spacing={2} sx={{ width: "200px" }}>
             <TextField
+              required
               value={enteredSubjectName}
               onChange={(event) => {
                 setEnteredSubjectName(event.target.value);
@@ -57,6 +58,7 @@ const AddSubjectForm = (props) => {
               variant="outlined"
             />
             <TextField
+              required
               value={enteredGrade}
               onChange={(event) => {
                 setEnteredGrade(event.target.value);
