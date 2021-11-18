@@ -30,7 +30,7 @@ const AddStudentToClassForm = (props) => {
         maLop={props.maLop}
         data={data}
         onClose={props.onClose}
-        onReload={props.onReload}
+        addStudents={props.addStudents}
       />
     </Dialog>
   );
@@ -49,7 +49,10 @@ const AddStudentToClassContent = (props) => {
           "Bạn đã thêm học sinh vào lớp thành công",
           "success"
         );
-        props.onReload();
+        const addedData = [...data].map((x) => {
+          return { ...x, id: x.maHS };
+        });
+        props.addStudents(addedData);
       } else if (error) swal("Đã có lỗi xảy ra", error, "error");
     }
   }, [data, error, status, props]);

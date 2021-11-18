@@ -5,6 +5,7 @@ import Link from "@mui/material/Link";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
+
 import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
 import { Search } from "@mui/icons-material";
@@ -19,13 +20,50 @@ const EditClass = () => {
   const history = useHistory();
   const params = useParams();
   const { sendRequest, status, error, data } = useHttp(getClassesById, true);
-  const [isReload, setIsReload] = React.useState(true);
-  useEffect(() => {
-    if (isReload === true) {
-      sendRequest([params.id, 1]);
-      setIsReload(false);
+
+  const [allStudents, setAllStudents] = React.useState([]);
+  const [searchStudents, setSearchStudents] = React.useState([]);
+  const [query, setQuery] = React.useState("");
+  const updateStudent = (Student) => {
+    let newStudents = allStudents.map((x) =>
+      x.maHS !== Student.maHS ? x : Student
+    );
+    setAllStudents(newStudents);
+  };
+  const delStudents = (Students) => {
+    let newStudents = [...allStudents];
+    for (let i = 0; i < Students.length; i++) {
+      newStudents = newStudents.filter((x) => x.maHS !== Students[i]);
     }
-  }, [sendRequest, params.id, isReload]);
+    console.log(newStudents);
+    setAllStudents(newStudents);
+  };
+  const addStudents = (Students) => {
+    let newStudents = [...allStudents];
+    console.log(newStudents);
+    newStudents.push(...Students);
+    console.log(newStudents);
+    setAllStudents(newStudents);
+  };
+  useEffect(() => {
+    sendRequest([params.id, 1]);
+  }, [sendRequest, params.id]);
+  useEffect(() => {
+    if (status === "completed" && data) {
+      setAllStudents(data.hocSinh);
+    }
+  }, [data, status]);
+  useEffect(() => {
+    if (query === "" || !query) {
+      setSearchStudents(allStudents);
+    } else {
+      setSearchStudents(
+        allStudents.filter((x) =>
+          x.hoTen.toUpperCase().includes(query.toUpperCase())
+        )
+      );
+    }
+  }, [allStudents, query]);
   const moveToClassesHandler = () => {
     history.push("/classes");
   };
@@ -38,6 +76,7 @@ const EditClass = () => {
   const hideAddStudentHandler = () => {
     setIsAddStudentDialogVisible(false);
   };
+
   if (status === "pending") return <Loading />;
   if (error) return <p>{error}</p>;
   return (
@@ -53,46 +92,49 @@ const EditClass = () => {
         </Link>
         <Typography color="text.primary">{data.tenLop}</Typography>
       </Breadcrumbs>
-      <Box
-        mb="16px"
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Typography variant="h4" component="h2" sx={{ fontWeight: 700 }}>
-          Danh sách học sinh lớp {data.tenLop}
-        </Typography>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <TextField
-            id="search"
-            label="Tìm kiếm"
-            variant="outlined"
-            size="small"
-            sx={{ marginRight: "8px" }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search />
-                </InputAdornment>
-              ),
+      <Grid container mb={2}>
+        <Grid item xs={12} md={8}>
+          <Typography variant="h4" component="h2" sx={{ fontWeight: 700 }}>
+            Thông tin lớp học
+          </Typography>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-end",
             }}
-          />
-          <Button
-            onClick={showAddStudentHandler}
-            variant="contained"
-            color="success"
           >
-            Thêm
-          </Button>
-        </Box>
-      </Box>
+            <TextField
+              id="search"
+              label="Tìm kiếm"
+              variant="outlined"
+              size="small"
+              value={query}
+              onChange={(event) => {
+                setQuery(event.target.value);
+              }}
+              sx={{ marginRight: "8px" }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <Button
+              onClick={showAddStudentHandler}
+              variant="contained"
+              color="success"
+            >
+              Thêm
+            </Button>
+          </Box>
+        </Grid>
+      </Grid>
+
       <Grid
         container
         sx={{
@@ -103,10 +145,11 @@ const EditClass = () => {
           <StudentOfClassTable
             maHK={1}
             maLop={data.maLop}
-            data={data.hocSinh}
-            onReload={() => {
-              setIsReload(true);
-            }}
+            data={searchStudents}
+            updateStudent={updateStudent}
+            delStudents={delStudents}
+            tenGVCN={data.tenGVCN}
+            tenLT={data.tenLT}
           />
         </Grid>
       </Grid>
@@ -117,9 +160,7 @@ const EditClass = () => {
           maLop={data.maLop}
           open={isAddStudentDialogVisible}
           onClose={hideAddStudentHandler}
-          onReload={() => {
-            setIsReload(true);
-          }}
+          addStudents={addStudents}
         />
       )}
     </>

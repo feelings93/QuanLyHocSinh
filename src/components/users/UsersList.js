@@ -10,7 +10,34 @@ import EditUserForm from "./EditUserForm";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
 import { Search } from "@mui/icons-material";
+import useHttp from "../../hooks/use-http";
+import { getAllUsers } from "../../lib/api";
+import Loading from "../UI/Loading";
 const UsersList = () => {
+  const { sendRequest, error, data, status } = useHttp(getAllUsers, true);
+  const [allUsers, setAllUsers] = React.useState([]);
+  const [searchUsers, setSearchUsers] = React.useState([]);
+  const [query, setQuery] = React.useState("");
+  const [editData, setEditData] = React.useState(null);
+
+  const delUsers = (Users) => {
+    let newUsers = [...allUsers];
+    for (let i = 0; i < Users.length; i++) {
+      newUsers = newUsers.filter((x) => x.id !== Users[i]);
+    }
+    console.log(newUsers);
+    setAllUsers(newUsers);
+  };
+  const updateUser = (User) => {
+    let newUsers = allUsers.map((x) => (x.id !== User.id ? x : User));
+    setAllUsers(newUsers);
+  };
+  const addUser = (User) => {
+    let newUsers = [...allUsers];
+    newUsers.push(User);
+
+    setAllUsers(newUsers);
+  };
   const [isAddUserDialogVisible, setIsAddUserDialogVisible] =
     React.useState(false);
   const [isEditUserDialogVisible, setIsEditUserDialogVisible] =
@@ -21,12 +48,35 @@ const UsersList = () => {
   const hideAddUserHandler = () => {
     setIsAddUserDialogVisible(false);
   };
-  const showEditUserHandler = (id) => {
+  const showEditUserHandler = (data) => {
+    setEditData(data);
     setIsEditUserDialogVisible(true);
   };
   const hideEditUserHandler = () => {
     setIsEditUserDialogVisible(false);
   };
+
+  React.useEffect(() => {
+    sendRequest();
+  }, [sendRequest]);
+  React.useEffect(() => {
+    if (status === "completed" && data) {
+      setAllUsers(data);
+    }
+  }, [data, status]);
+  React.useEffect(() => {
+    if (query === "" || !query) {
+      setSearchUsers(allUsers);
+    } else {
+      setSearchUsers(
+        allUsers.filter((x) =>
+          x.name.toUpperCase().includes(query.toUpperCase())
+        )
+      );
+    }
+  }, [allUsers, query]);
+  if (status === "pending") return <Loading />;
+  if (error) return <p>{error}</p>;
   return (
     <>
       <Breadcrumbs mb="16px" aria-label="breadcrumb">
@@ -55,6 +105,10 @@ const UsersList = () => {
             variant="outlined"
             size="small"
             sx={{ marginRight: "8px" }}
+            value={query}
+            onChange={(event) => {
+              setQuery(event.target.value);
+            }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -79,21 +133,30 @@ const UsersList = () => {
         }}
       >
         <Grid item xs={12}>
-          <UsersTable onShowEdit={showEditUserHandler} data={users} />
+          <UsersTable
+            onShowEdit={showEditUserHandler}
+            data={searchUsers}
+            delUsers={delUsers}
+          />
         </Grid>
       </Grid>
-      <AddUserForm open={isAddUserDialogVisible} onClose={hideAddUserHandler} />
-      <EditUserForm
-        open={isEditUserDialogVisible}
-        onClose={hideEditUserHandler}
-      />
+      {isAddUserDialogVisible && (
+        <AddUserForm
+          open={isAddUserDialogVisible}
+          onClose={hideAddUserHandler}
+          addUser={addUser}
+        />
+      )}
+      {isEditUserDialogVisible && (
+        <EditUserForm
+          open={isEditUserDialogVisible}
+          onClose={hideEditUserHandler}
+          editUser={editData}
+          updateUser={updateUser}
+        />
+      )}
     </>
   );
 };
-const users = [
-  { id: 1, tenDangNhap: "feelings93", dangHoatDong: true, vaiTro: "Giáo viên" },
-  { id: 2, tenDangNhap: "feelings92", dangHoatDong: false, vaiTro: "Giáo vụ" },
-  { id: 3, tenDangNhap: "feelings93", dangHoatDong: true, vaiTro: "Giáo viên" },
-  { id: 4, tenDangNhap: "feelings93", dangHoatDong: true, vaiTro: "Giáo viên" },
-];
+
 export default UsersList;

@@ -4,16 +4,19 @@ import IconButton from "@mui/material/IconButton";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { makeStyles } from "@mui/styles";
-
-import {
-  DeleteOutlined,
-  EditOutlined,
-  Restore,
-  Block,
-} from "@mui/icons-material";
-import Chip from "@mui/material/Chip";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import { DeleteOutlined, EditOutlined, Restore } from "@mui/icons-material";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
+import { deleteUsers, resetPassword } from "../../lib/api";
+import useHttp from "../../hooks/use-http";
+import swal from "sweetalert";
+import LinearLoading from "../UI/LinearLoading";
+const roles = ["Admin", "Hiệu trưởng", "Giáo vụ"];
 
 const useStyles = makeStyles({
   root: {
@@ -26,32 +29,47 @@ const useStyles = makeStyles({
 const UsersTable = (props) => {
   const classes = useStyles();
   const [pageSize, setPageSize] = React.useState(5);
+  const [maNguoiDung, setMaNguoiDung] = React.useState();
+
   const [selectedList, setSelectedList] = React.useState([]);
+  const [open, setOpen] = React.useState(false);
+  const [openReset, setOpenReset] = React.useState(false);
+
+  const [listUser, setListUser] = React.useState([]);
+
   const deleteUsersHandler = () => {
-    console.log(selectedList);
+    handleClickOpen();
   };
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const handleClickOpenReset = () => {
+    setOpenReset(true);
+  };
+
+  const handleCloseReset = () => {
+    setOpenReset(false);
+  };
+  const deleteOneUserHandler = (id) => {
+    setListUser([id]);
+    handleClickOpen();
+  };
+
   const columns = [
     { field: "id", headerName: "Mã người dùng", width: 150 },
-    { field: "tenDangNhap", headerName: "Tên đăng nhập", width: 150 },
-    { field: "vaiTro", headerName: "Vai trò", width: 150 },
+    { field: "name", headerName: "Họ tên", width: 150 },
+    { field: "email", headerName: "Email", width: 200 },
     {
-      field: "dangHoatDong",
-      headerName: "Trạng thái",
-      sortable: false,
+      field: "maNhom",
+      valueGetter: (params) => roles[params.row.maNhom - 1],
+      headerName: "Vai trò",
       width: 150,
-      renderCell: (params) => {
-        return (
-          <Chip
-            sx={params.row.dangHoatDong ? { color: "#fff" } : {}}
-            label={
-              params.row.dangHoatDong ? "Đang hoạt động" : "Ngưng hoạt động"
-            }
-            color={params.row.dangHoatDong ? "success" : "secondary"}
-            variant={params.row.dangHoatDong ? "contained" : "outlined"}
-          />
-        );
-      },
     },
+
     {
       field: "action",
       headerName: "Hành động",
@@ -70,32 +88,24 @@ const UsersTable = (props) => {
           <IconButton
             title="Sửa"
             variant="dark"
-            onClick={props.onShowEdit.bind(null, params.id)}
+            onClick={props.onShowEdit.bind(null, params.row)}
           >
             <EditOutlined color="primary" />
           </IconButton>
-          {params.row.dangHoatDong ? (
-            <IconButton
-              title="Vô hiệu hóa"
-              variant="dark"
-              //   onClick={deleteOneStudentHandler.bind(null, params.id)}
-            >
-              <Block color="secondary" />
-            </IconButton>
-          ) : (
-            <IconButton
-              title="Cho phép hoạt động lại"
-              variant="dark"
-              //   onClick={deleteOneStudentHandler.bind(null, params.id)}
-            >
-              <Restore color="success" />
-            </IconButton>
-          )}
+          <IconButton
+            title="Khôi phục"
+            variant="dark"
+            onClick={() => {
+              setMaNguoiDung(params.id);
+              handleClickOpenReset(true);
+            }}
+          >
+            <Restore color="success" />
+          </IconButton>
           <IconButton
             title="Xóa"
             variant="dark"
-
-            //   onClick={deleteOneStudentHandler.bind(null, params.id)}
+            onClick={deleteOneUserHandler.bind(null, params.id)}
           >
             <DeleteOutlined color="action" />
           </IconButton>
@@ -135,6 +145,7 @@ const UsersTable = (props) => {
         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
         onSelectionModelChange={(params) => {
           setSelectedList(params);
+          setListUser(params);
         }}
         pagination
         disableColumnMenu
@@ -144,8 +155,124 @@ const UsersTable = (props) => {
         rowsPerPageOptions={[5, 10, 20]}
         columns={columns}
       />
+      {open && (
+        <AlertDialog
+          listUser={listUser}
+          onClose={handleClose}
+          delUsers={props.delUsers}
+        />
+      )}
+      {openReset && (
+        <AlertDialogReset
+          maNguoiDung={maNguoiDung}
+          onClose={handleCloseReset}
+          delUsers={props.delUsers}
+        />
+      )}
     </div>
   );
 };
+function AlertDialog(props) {
+  const { sendRequest, status, data, error } = useHttp(deleteUsers);
+  React.useEffect(() => {
+    if (status === "completed") {
+      if (data) {
+        props.onClose();
+        console.log(data);
+        swal("Xóa thành công!", "Bạn đã xóa người dùng thành công", "success");
+        props.delUsers(props.listUser);
+      } else if (error) swal("Đã có lỗi xảy ra", error, "error");
+    }
+  }, [data, error, status, props]);
+  const deleteUsersSubmitHandler = (event) => {
+    event.preventDefault();
+    let request = {
+      id: props.listUser,
+    };
+    sendRequest(request);
+  };
+  return (
+    <div>
+      <Dialog
+        open={true}
+        onClose={props.onClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <form onSubmit={deleteUsersSubmitHandler}>
+          {status === "pending" && <LinearLoading />}
+          <DialogTitle id="alert-dialog-title">Cảnh báo</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              Bạn có muốn xóa những người dùng này không?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              disabled={status === "pending"}
+              variant="contained"
+              type="submit"
+              autoFocus
+            >
+              {status === "pending" ? "Đang xóa..." : "Xác nhận"}
+            </Button>
+            <Button onClick={props.onClose}>Hủy</Button>
+          </DialogActions>
+        </form>
+      </Dialog>
+    </div>
+  );
+}
+function AlertDialogReset(props) {
+  const { sendRequest, status, data, error } = useHttp(resetPassword);
+  React.useEffect(() => {
+    if (status === "completed") {
+      if (data) {
+        props.onClose();
+        console.log(data);
+        swal(
+          "Khôi phục thành công!",
+          "Bạn đã khôi phục mật khẩu người dùng thành công",
+          "success"
+        );
+      } else if (error) swal("Đã có lỗi xảy ra", error, "error");
+    }
+  }, [data, error, status, props]);
+  const resetPasswordSubmitHandler = (event) => {
+    event.preventDefault();
 
+    sendRequest(props.maNguoiDung);
+  };
+  return (
+    <div>
+      <Dialog
+        open={true}
+        onClose={props.onClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <form onSubmit={resetPasswordSubmitHandler}>
+          {status === "pending" && <LinearLoading />}
+          <DialogTitle id="alert-dialog-title">Cảnh báo</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              Bạn có khôi phục mật khẩu cho người dùng này không?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              disabled={status === "pending"}
+              variant="contained"
+              type="submit"
+              autoFocus
+            >
+              {status === "pending" ? "Đang xóa..." : "Xác nhận"}
+            </Button>
+            <Button onClick={props.onClose}>Hủy</Button>
+          </DialogActions>
+        </form>
+      </Dialog>
+    </div>
+  );
+}
 export default UsersTable;

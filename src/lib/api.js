@@ -14,7 +14,7 @@ const toStr = (arr) => {
 // Học sinh
 export async function getAllStudents() {
   try {
-    const response = await axios.get(`${BACKEND_DOMAIN}/api/auth/hoc-sinh`, {
+    const response = await axios.get(`${BACKEND_DOMAIN}/api/hoc-sinh`, {
       headers: {
         Authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
@@ -233,6 +233,30 @@ export async function delStudentsFromClass(request) {
   } catch (error) {
     if (error.response.status === 401) {
       throw new Error(error.response.data.message || "Not auth.");
+    }
+  }
+}
+export async function editStudentOfClass(request) {
+  var params = new URLSearchParams();
+  params.append("tinhTrangBaoHiem", request.tinhTrangBaoHiem);
+  params.append("tinhTrangHocPhi", request.tinhTrangHocPhi);
+  params.append("hanhKiem", request.hanhKiem);
+  params.append("token", localStorage.getItem("accessToken"));
+  try {
+    const response = await axios.put(
+      `${BACKEND_DOMAIN}/api/qth/${request.maQTH}`,
+      params,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    const data = await response.data;
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập.");
     }
   }
 }
@@ -504,13 +528,13 @@ export async function editParams(request) {
 }
 // Người dùng
 export async function login(request) {
-  var formData = new FormData();
-  formData.append("email", request.email);
-  formData.append("password", request.password);
+  var params = new URLSearchParams();
+  params.append("email", request.email);
+  params.append("password", request.password);
   try {
     const response = await axios.post(
       `${BACKEND_DOMAIN}/api/auth/login`,
-      formData
+      params
     );
     const data = await response.data;
     return data;
@@ -518,12 +542,47 @@ export async function login(request) {
     console.log(error);
     if (error.response.status === 401) {
       throw new Error(
-        error.respone.data.message || "Thông tin đăng nhập không chính xác"
+        error.response.data.message || "Thông tin đăng nhập không chính xác"
       );
     }
   }
 }
-export async function getUser(request) {
+export async function logout() {
+  var params = new URLSearchParams();
+  params.append("token", localStorage.getItem("accessToken"));
+  try {
+    const response = await axios.post(
+      `${BACKEND_DOMAIN}/api/auth/logout`,
+      params
+    );
+    const data = await response.data;
+    return data;
+  } catch (error) {
+    console.log(error);
+    if (error.response.status === 401) {
+      throw new Error(
+        error.response.data.message || "Thông tin đăng nhập không chính xác"
+      );
+    }
+    throw new Error("Đã có lỗi xảy ra");
+  }
+}
+export async function getAllUsers() {
+  try {
+    const response = await axios.get(`${BACKEND_DOMAIN}/api/auth/users`, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+    });
+    const data = await response.data;
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error("Chưa đăng nhập");
+    }
+  }
+}
+export async function getUser() {
   var formData = new FormData();
   formData.append("token", localStorage.getItem("accessToken"));
   try {
@@ -539,5 +598,135 @@ export async function getUser(request) {
         error.response.data.message || "Cần đăng nhập để sử dụng"
       );
     }
+  }
+}
+export async function addUser(request) {
+  var params = new URLSearchParams();
+  params.append("hoTen", request.hoTen);
+  params.append("email", request.email);
+  params.append("password", request.password);
+  params.append("maNhom", request.maNhom);
+  params.append("token", localStorage.getItem("accessToken"));
+  try {
+    const response = await axios.post(
+      `${BACKEND_DOMAIN}/api/auth/register`,
+
+      params
+    );
+    const data = await response.data;
+
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
+    if (error.response.status === 422) {
+      throw new Error(
+        error.response.data.message ||
+          "Vui lòng kiểm tra thông tin các trường đã nhập"
+      );
+    }
+    throw new Error("Lỗi server");
+  }
+}
+export async function editUser(request) {
+  var params = new URLSearchParams();
+  params.append("hoTen", request.hoTen);
+  params.append("maNhom", request.maNhom);
+  params.append("token", localStorage.getItem("accessToken"));
+  try {
+    const response = await axios.put(
+      `${BACKEND_DOMAIN}/api/auth/user/${request.id}`,
+
+      params
+    );
+    const data = await response.data;
+
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
+    if (error.response.status === 422) {
+      throw new Error(
+        error.response.data.message ||
+          "Vui lòng kiểm tra thông tin các trường đã nhập"
+      );
+    }
+    throw new Error("Lỗi server");
+  }
+}
+export async function deleteUsers(request) {
+  var params = new URLSearchParams();
+  params.append("id", JSON.stringify(request.id));
+  params.append("token", localStorage.getItem("accessToken"));
+  try {
+    const response = await axios.post(
+      `${BACKEND_DOMAIN}/api/auth/users/delete`,
+
+      params
+    );
+    const data = await response.data;
+
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
+    if (error.response.status === 404) {
+      throw new Error(
+        error.response.data.message || "Không tìm thấy người dùng"
+      );
+    }
+    throw new Error("Lỗi server");
+  }
+}
+export async function resetPassword(id) {
+  var params = new URLSearchParams();
+  params.append("token", localStorage.getItem("accessToken"));
+  try {
+    const response = await axios.post(
+      `${BACKEND_DOMAIN}/api/auth/reset/user/${id}`,
+
+      params
+    );
+    const data = await response.data;
+
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
+    if (error.response.status === 404) {
+      throw new Error(
+        error.response.data.message || "Không tìm thấy người dùng"
+      );
+    }
+    throw new Error("Lỗi server");
+  }
+}
+export async function editProfile(request) {
+  var params = new URLSearchParams();
+  params.append("hoTen", request.hoTen);
+  params.append("token", localStorage.getItem("accessToken"));
+  try {
+    const response = await axios.put(
+      `${BACKEND_DOMAIN}/api/profile/${request.id}`,
+      params
+    );
+    const data = await response.data;
+
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
+    if (error.response.status === 422) {
+      throw new Error(
+        error.response.data.message ||
+          "Vui lòng kiểm tra thông tin các trường đã nhập"
+      );
+    }
+    throw new Error("Lỗi server");
   }
 }

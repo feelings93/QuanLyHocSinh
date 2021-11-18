@@ -125,7 +125,12 @@ function App() {
               <Box sx={{ display: "flex" }}>
                 <SideBar />
                 <Box sx={{ flex: "1" }}>
-                  <Header nameUser={data.name} />
+                  <Header
+                    user={data}
+                    onReload={() => {
+                      setIsReload(true);
+                    }}
+                  />
                   <main>
                     <Suspense
                       fallback={
