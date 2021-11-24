@@ -30,6 +30,14 @@ const StudentsList = () => {
     );
     setAllStudents(newStudents);
   };
+  const delStudents = (Students) => {
+    let newStudents = [...allStudents];
+    for (let i = 0; i < Students.length; i++) {
+      newStudents = newStudents.filter((x) => x.maHS !== Students[i]);
+    }
+    console.log(newStudents);
+    setAllStudents(newStudents);
+  };
   const addStudent = (Student) => {
     let newStudents = [...allStudents];
     newStudents.push(Student);
@@ -141,6 +149,7 @@ const StudentsList = () => {
           <StudentsTable
             onShowEdit={showEditStudentHandler}
             data={searchStudents}
+            delStudents={delStudents}
           />
         </Grid>
       </Grid>

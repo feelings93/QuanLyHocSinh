@@ -61,8 +61,8 @@ const UsersTable = (props) => {
 
   const columns = [
     { field: "id", headerName: "Mã người dùng", width: 150 },
-    { field: "name", headerName: "Họ tên", width: 150 },
-    { field: "email", headerName: "Email", width: 200 },
+    { field: "name", headerName: "Họ tên", width: 200 },
+    { field: "email", headerName: "Email", width: 250 },
     {
       field: "maNhom",
       valueGetter: (params) => roles[params.row.maNhom - 1],

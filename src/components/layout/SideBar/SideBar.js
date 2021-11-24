@@ -5,8 +5,10 @@ import logo from "../../../assets/img/logo.png";
 import TabList from "./TabList";
 // import MenuIcon from "@mui/icons-material/Menu";
 // import IconButton from "@mui/material/IconButton";
+
 import Box from "@mui/material/Box";
-const TAB_ITEMS = [
+
+const TAB_ITEMShi = [
   {
     link: "/home",
     title: "Trang chủ",
@@ -24,7 +26,7 @@ const TAB_ITEMS = [
   },
   {
     link: "/courses",
-    title: "Chương trình học",
+    title: "Chương trình",
     icon: "description",
   },
   {
@@ -37,18 +39,24 @@ const TAB_ITEMS = [
     title: "Báo cáo",
     icon: "show_chart",
   },
-  {
-    link: "/rules",
-    title: "Quy định",
-    icon: "chat",
-  },
-  {
-    link: "/users",
-    title: "Người dùng",
-    icon: "person",
-  },
 ];
-const SideBar = () => {
+const SideBar = (props) => {
+  let TAB_ITEMS;
+  if (props.user.maNhom === 1 || props.user.maNhom === 2)
+    TAB_ITEMS = [
+      ...TAB_ITEMShi,
+      {
+        link: "/rules",
+        title: "Quy định",
+        icon: "chat",
+      },
+      {
+        link: "/users",
+        title: "Người dùng",
+        icon: "person",
+      },
+    ];
+  else TAB_ITEMS = [...TAB_ITEMShi];
   return (
     <>
       <div className={classes["side-bar"]}>

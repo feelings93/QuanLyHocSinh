@@ -38,6 +38,14 @@ const CoursesList = () => {
     );
     setAllCourses(newCourses);
   };
+  const delCourses = (Courses) => {
+    let newCourses = [...allCourses];
+    for (let i = 0; i < Courses.length; i++) {
+      newCourses = newCourses.filter((x) => x.maCTH !== Courses[i]);
+    }
+    console.log(newCourses);
+    setAllCourses(newCourses);
+  };
   const addCourse = (course) => {
     let newCourses = [...allCourses];
     newCourses.push(course);
@@ -101,7 +109,11 @@ const CoursesList = () => {
         }}
       >
         <Grid item xs={12}>
-          <CoursesTable onShowEdit={showEditCourseHandler} data={allCourses} />
+          <CoursesTable
+            delCourses={delCourses}
+            onShowEdit={showEditCourseHandler}
+            data={allCourses}
+          />
         </Grid>
       </Grid>
       <CoursesDialog

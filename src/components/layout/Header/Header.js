@@ -14,14 +14,19 @@ import Menu from "@mui/material/Menu";
 
 import Divider from "@mui/material/Divider";
 
-import { PersonOutlined } from "@mui/icons-material";
+import { PersonOutlined, VpnKeyOutlined } from "@mui/icons-material";
 import useHttp from "../../../hooks/use-http";
 import { logout } from "../../../lib/api";
 import EditProfileForm from "../../profile/EditProfileForm";
+import EditPasswordForm from "../../profile/EditPasswordForm";
+import swal from "sweetalert";
+
 const Header = (props) => {
-  const { sendRequest } = useHttp(logout);
+  const { sendRequest, data, status, error } = useHttp(logout);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [isEditProfileDialogVisible, setIsEditProfileDialogVisible] =
+    React.useState(false);
+  const [isEditPasswordDialogVisible, setIsEditPasswordDialogVisible] =
     React.useState(false);
 
   const handleClick = (event) => {
@@ -31,12 +36,26 @@ const Header = (props) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const showEditPasswordHandler = () => {
+    setIsEditPasswordDialogVisible(true);
+  };
+  const hideEditPasswordHandler = () => {
+    setIsEditPasswordDialogVisible(false);
+  };
   const showEditProfileHandler = () => {
     setIsEditProfileDialogVisible(true);
   };
   const hideEditProfileHandler = () => {
     setIsEditProfileDialogVisible(false);
   };
+  React.useEffect(() => {
+    if (status === "completed") {
+      if (data) {
+        window.location.reload();
+      } else if (error) swal("Đã có lỗi xảy ra", error, "error");
+    }
+  }, [data, error, status, props]);
+
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
   return (
@@ -104,7 +123,11 @@ const Header = (props) => {
                 <Stack direction="column" sx={{ minWidth: "200px" }}>
                   <Typography variant="h6">{props.user.name}</Typography>
                   <Typography variant="subtitle1" color="text.secondary">
-                    Admin
+                    {props.user.maNhom === 1
+                      ? "Admin"
+                      : props.user.maNhom === 2
+                      ? "Hiệu trưởng"
+                      : "Giáo vụ"}
                   </Typography>
                   <Typography variant="subtitle2" color="text.secondary">
                     {props.user.email}
@@ -154,7 +177,48 @@ const Header = (props) => {
                   </Typography>
                 </Stack>
               </Stack>
+              <Stack
+                sx={{
+                  cursor: "pointer",
+                  "&:hover": { background: "rgba(0, 0, 0, 0.03)" },
+                  borderRadius: "4",
+                }}
+                spacing={2}
+                mt={2}
+                pl={2}
+                pr={2}
+                direction="row"
+                alignItems="center"
+                onClick={showEditPasswordHandler}
+              >
+                <Box
+                  sx={{
+                    background: "#E6F4FF",
+                    padding: "6px 8px",
+                    borderRadius: "4px",
+                    minWidth: "45px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <VpnKeyOutlined />
+                </Box>
 
+                <Stack
+                  direction="column"
+                  sx={{
+                    minWidth: "200px",
+                  }}
+                >
+                  <Typography sx={{ fontWeight: 500, fontSize: "18px" }}>
+                    Bảo mật
+                  </Typography>
+                  <Typography variant="subtitle1" color="text.secondary">
+                    Thay đổi mật khẩu
+                  </Typography>
+                </Stack>
+              </Stack>
               <Divider />
               <Button
                 mt={2}
@@ -178,6 +242,13 @@ const Header = (props) => {
           open={isEditProfileDialogVisible}
           onClose={hideEditProfileHandler}
           onReload={props.onReload}
+        />
+      )}
+      {isEditPasswordDialogVisible && (
+        <EditPasswordForm
+          editUser={props.user}
+          open={isEditPasswordDialogVisible}
+          onClose={hideEditPasswordHandler}
         />
       )}
     </Box>

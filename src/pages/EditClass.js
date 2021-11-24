@@ -9,19 +9,29 @@ import Grid from "@mui/material/Grid";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
 import { Search } from "@mui/icons-material";
-import { useHistory, useParams } from "react-router-dom";
+import { useHistory, useParams, useLocation } from "react-router-dom";
 import AddStudentToClassForm from "../components/classes/AddStudentToClassForm";
 import StudentOfClassTable from "../components/classes/StudentOfClassTable";
 import useHttp from "../hooks/use-http";
 import { getClassesById } from "../lib/api";
 import Loading from "../components/UI/Loading";
+import EditCanBo from "../components/classes/EditCanBo";
 
-const EditClass = () => {
+function useQuery() {
+  const { search } = useLocation();
+
+  return React.useMemo(() => new URLSearchParams(search), [search]);
+}
+
+const EditClass = (props) => {
+  let queryParams = useQuery();
   const history = useHistory();
   const params = useParams();
   const { sendRequest, status, error, data } = useHttp(getClassesById, true);
 
   const [allStudents, setAllStudents] = React.useState([]);
+  const [tenGVCN, setTenGVCN] = React.useState("");
+  const [tenLT, setTenLT] = React.useState("");
   const [searchStudents, setSearchStudents] = React.useState([]);
   const [query, setQuery] = React.useState("");
   const updateStudent = (Student) => {
@@ -46,11 +56,13 @@ const EditClass = () => {
     setAllStudents(newStudents);
   };
   useEffect(() => {
-    sendRequest([params.id, 1]);
-  }, [sendRequest, params.id]);
+    sendRequest([params.id, queryParams.get("maHK")]);
+  }, [sendRequest, params.id, queryParams]);
   useEffect(() => {
     if (status === "completed" && data) {
       setAllStudents(data.hocSinh);
+      setTenGVCN(data.tenGVCN);
+      setTenLT(data.tenLT);
     }
   }, [data, status]);
   useEffect(() => {
@@ -67,7 +79,10 @@ const EditClass = () => {
   const moveToClassesHandler = () => {
     history.push("/classes");
   };
-
+  const editCanBoHandler = (data) => {
+    setTenGVCN(data.tenGVCN);
+    setTenLT(data.tenLT);
+  };
   const [isAddStudentDialogVisible, setIsAddStudentDialogVisible] =
     React.useState(false);
   const showAddStudentHandler = () => {
@@ -75,6 +90,14 @@ const EditClass = () => {
   };
   const hideAddStudentHandler = () => {
     setIsAddStudentDialogVisible(false);
+  };
+  const [isEditCanBoDialogVisible, setIsEditCanBoDialogVisible] =
+    React.useState(false);
+  const showEditCanBoHandler = () => {
+    setIsEditCanBoDialogVisible(true);
+  };
+  const hideEditCanBoHandler = () => {
+    setIsEditCanBoDialogVisible(false);
   };
 
   if (status === "pending") return <Loading />;
@@ -90,7 +113,12 @@ const EditClass = () => {
         >
           Lớp học
         </Link>
-        <Typography color="text.primary">{data.tenLop}</Typography>
+
+        <Typography color="text.primary">{`${data.tenLop} - ${
+          props.hk.find(
+            (x) => x.maHK.toString() === queryParams.get("maHK").toString()
+          ).tenHK
+        }`}</Typography>
       </Breadcrumbs>
       <Grid container mb={2}>
         <Grid item xs={12} md={8}>
@@ -148,19 +176,30 @@ const EditClass = () => {
             data={searchStudents}
             updateStudent={updateStudent}
             delStudents={delStudents}
-            tenGVCN={data.tenGVCN}
-            tenLT={data.tenLT}
+            tenGVCN={tenGVCN}
+            tenLT={tenLT}
+            onShowEditCanBo={showEditCanBoHandler}
           />
         </Grid>
       </Grid>
 
       {isAddStudentDialogVisible && (
         <AddStudentToClassForm
-          maHK={1}
+          maHK={queryParams.get("maHK")}
           maLop={data.maLop}
           open={isAddStudentDialogVisible}
           onClose={hideAddStudentHandler}
           addStudents={addStudents}
+        />
+      )}
+      {isEditCanBoDialogVisible && (
+        <EditCanBo
+          maHK={queryParams.get("maHK")}
+          maLop={data.maLop}
+          open={isEditCanBoDialogVisible}
+          onClose={hideEditCanBoHandler}
+          students={allStudents}
+          onEditCanBo={editCanBoHandler}
         />
       )}
     </>

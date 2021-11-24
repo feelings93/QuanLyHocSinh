@@ -36,6 +36,14 @@ const SubjectsList = () => {
     );
     setAllSubjects(newSubjects);
   };
+  const delSubjects = (Subjects) => {
+    let newSubjects = [...allSubjects];
+    for (let i = 0; i < Subjects.length; i++) {
+      newSubjects = newSubjects.filter((x) => x.maMH !== Subjects[i]);
+    }
+    console.log(newSubjects);
+    setAllSubjects(newSubjects);
+  };
   const addSubject = (subject) => {
     let newSubjects = [...allSubjects];
     newSubjects.push(subject);
@@ -104,6 +112,7 @@ const SubjectsList = () => {
           <SubjectsTable
             onShowEdit={showEditSubjectHandler}
             data={allSubjects}
+            delSubjects={delSubjects}
           />
         </Grid>
       </Grid>

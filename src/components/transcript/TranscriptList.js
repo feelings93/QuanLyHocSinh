@@ -1,7 +1,7 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
-import Button from "@mui/material/Button";
+
 import React from "react";
 import TranscriptTable from "./TranscriptTable";
 import InputAdornment from "@mui/material/InputAdornment";
@@ -33,9 +33,7 @@ const TranscriptList = () => {
   const hideAddLoaiHinhKTHandler = () => {
     setIsAddLoaiHinhKTDialogVisible(false);
   };
-  const showLoaiHinhKTCourseHandler = () => {
-    setIsAddLoaiHinhKTDialogVisible(true);
-  };
+
   const LopHandleChange = (event) => {
     setLop(event.target.value);
   };
@@ -112,13 +110,13 @@ const TranscriptList = () => {
             >
               {data.hocKy.map((item) => (
                 <MenuItem key={item.maHK} value={item}>
-                  {item.tenHK + " " + item.namHoc}
+                  {item.tenHK}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
         </Grid>
-        <Grid item sm={6} sx={{ justifyContent: "flex-end" }}>
+        <Grid display="flex" item sm={6} sx={{ justifyContent: "flex-end" }}>
           <TextField
             id="search"
             value={query}
@@ -137,13 +135,13 @@ const TranscriptList = () => {
               ),
             }}
           />
-          <Button
+          {/* <Button
             variant="contained"
             color="success"
             onClick={showLoaiHinhKTCourseHandler}
           >
             Thêm
-          </Button>
+          </Button> */}
         </Grid>
         <Box
           marginTop="10px"

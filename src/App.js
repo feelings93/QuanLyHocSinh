@@ -31,6 +31,9 @@ import Regulation from "./pages/Regulation";
 
 const theme = createTheme(
   {
+    typography: {
+      fontFamily: "Inter, Roboto, san-serif",
+    },
     palette: {
       primary: { main: "#03c9d7" },
       secondary: { main: "#fc9678" },
@@ -123,7 +126,7 @@ function App() {
           <Route path="/">
             {!error ? (
               <Box sx={{ display: "flex" }}>
-                <SideBar />
+                <SideBar user={data} />
                 <Box sx={{ flex: "1" }}>
                   <Header
                     user={data}
@@ -169,12 +172,18 @@ function App() {
                         <Route exact path="/statistic">
                           <Statistic />
                         </Route>
-                        <Route exact path="/users">
-                          <Users />
-                        </Route>
-                        <Route exact path="/rules">
-                          <Regulation />
-                        </Route>
+                        {data.maNhom === 0 || data.maNhom === 1 ? (
+                          <>
+                            <Route exact path="/users">
+                              <Users />
+                            </Route>
+                            <Route exact path="/rules">
+                              <Regulation />
+                            </Route>
+                          </>
+                        ) : (
+                          <></>
+                        )}
                       </Switch>
                     </Suspense>
                   </main>

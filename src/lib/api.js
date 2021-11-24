@@ -112,9 +112,33 @@ export async function editStudent(request) {
     }
   }
 }
+export async function delStudents(request) {
+  var params = new URLSearchParams();
+  params.append("maHS", JSON.stringify(request.maHS));
+  params.append("token", localStorage.getItem("accessToken"));
+  try {
+    const response = await axios.post(
+      `${BACKEND_DOMAIN}/api/hoc-sinh/delete`,
+      params,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    const data = await response.data;
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Not auth.");
+    }
+
+    throw new Error(error.response.data.message || "Lỗi server");
+  }
+}
 // Lớp
-export async function getAllClasses() {
-  const response = await axios.get(`${BACKEND_DOMAIN}/api/lop`, {
+export async function getAllClasses(maHK) {
+  const response = await axios.get(`${BACKEND_DOMAIN}/api/lop&maHK=${maHK}`, {
     headers: {
       Authorization: "Bearer " + localStorage.getItem("accessToken"),
     },
@@ -147,6 +171,7 @@ export async function addClass(request) {
     if (error.response.status === 401) {
       throw new Error(error.response.data.message || "Chưa đăng nhập");
     }
+    throw new Error(error.response.data.message || "Lỗi server");
   }
 }
 export async function getClassesById(id) {
@@ -211,6 +236,7 @@ export async function addStudentsToClass(request) {
     if (error.response.status === 401) {
       throw new Error(error.response.data.message || "Chưa đăng nhập.");
     }
+    throw new Error(error.response.data.message || "Lỗi server");
   }
 }
 
@@ -234,6 +260,8 @@ export async function delStudentsFromClass(request) {
     if (error.response.status === 401) {
       throw new Error(error.response.data.message || "Not auth.");
     }
+
+    throw new Error(error.response.data.message || "Lỗi server");
   }
 }
 export async function editStudentOfClass(request) {
@@ -258,6 +286,46 @@ export async function editStudentOfClass(request) {
     if (error.response.status === 401) {
       throw new Error(error.response.data.message || "Chưa đăng nhập.");
     }
+  }
+}
+export async function getTeachersEmptyHK(maHK) {
+  try {
+    const response = await axios.get(`${BACKEND_DOMAIN}/api/gv-trong/${maHK}`, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+    });
+    const data = await response.data;
+    for (var i = 0; i < data.length; i++) {
+      data[i].id = data[i].maGV;
+    }
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
+  }
+}
+export async function editCanBoLop(request) {
+  var params = new URLSearchParams();
+  params.append("maGVCN", request.maGVCN);
+  params.append("maLT", request.maLT);
+  params.append("maLop", request.maLop);
+  params.append("maHK", request.maHK);
+  params.append("token", localStorage.getItem("accessToken"));
+  try {
+    const response = await axios.put(`${BACKEND_DOMAIN}/api/qll`, params, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+    const data = await response.data;
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập.");
+    }
+    throw new Error("Lỗi server");
   }
 }
 // Chương trình học
@@ -333,6 +401,30 @@ export async function editCourse(request) {
     }
   }
 }
+export async function delCourses(request) {
+  var params = new URLSearchParams();
+  params.append("maCTH", JSON.stringify(request.maCTH));
+  params.append("token", localStorage.getItem("accessToken"));
+  try {
+    const response = await axios.post(
+      `${BACKEND_DOMAIN}/api/cth/delete`,
+      params,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    const data = await response.data;
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Not auth.");
+    }
+
+    throw new Error(error.response.data.message || "Lỗi server");
+  }
+}
 //  Môn học
 export async function getAllSubjects() {
   try {
@@ -381,16 +473,21 @@ export async function addSubject(request) {
 }
 
 export async function getSubjectById(id) {
-  const response = await axios.get(`${BACKEND_DOMAIN}/api/mon-hoc/${id}`, {
-    headers: {
-      Authorization: "Bearer " + localStorage.getItem("accessToken"),
-    },
-  });
-  const data = await response.data;
-  if (response.status === 401) {
-    throw new Error("Chưa đăng nhập");
+  try {
+    const response = await axios.get(`${BACKEND_DOMAIN}/api/mon-hoc/${id}`, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+    });
+    const data = await response.data;
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
+
+    throw new Error("Lỗi server");
   }
-  return data;
 }
 
 export async function editSubject(request) {
@@ -419,31 +516,63 @@ export async function editSubject(request) {
         error.response.data.message || "Các trường bị sai thông tin"
       );
     }
+    throw new Error("Lỗi server");
+  }
+}
+export async function delSubjects(request) {
+  var params = new URLSearchParams();
+  params.append("maMH", JSON.stringify(request.maMH));
+  params.append("token", localStorage.getItem("accessToken"));
+  try {
+    const response = await axios.post(
+      `${BACKEND_DOMAIN}/api/mon-hoc/delete`,
+      params,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    const data = await response.data;
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Not auth.");
+    }
+
+    throw new Error(error.response.data.message || "Lỗi server");
   }
 }
 // Bảng điểm
 export async function getAllTranscripts(info) {
-  const response = await axios.get(
-    `${BACKEND_DOMAIN}/api/bang-diem/${info.maHK}/${info.maLop}/${info.maMH}`,
-    {
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
+  try {
+    const response = await axios.get(
+      `${BACKEND_DOMAIN}/api/bang-diem/${info.maHK}/${info.maLop}/${info.maMH}`,
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+      }
+    );
+    const data = await response.data;
+    for (var i = 0; i < data.length; i++) {
+      data[i].id = data[i].maHS;
+      data[i].diemMieng = toStr(data[i].diemMieng);
+      data[i].diem15P = toStr(data[i].diem15P);
+      data[i].diem1Tiet = toStr(data[i].diem1Tiet);
+      data[i].diemHK = toStr(data[i].diemHK);
     }
-  );
-  const data = await response.data;
-  if (response.status === 401) {
-    throw new Error("Chưa đăng nhập");
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
+    if (error.response.status === 422) {
+      throw new Error(
+        error.response.data.message || "Các trường bị sai thông tin"
+      );
+    }
   }
-
-  for (var i = 0; i < data.length; i++) {
-    data[i].id = data[i].maHS;
-    data[i].diemMieng = toStr(data[i].diemMieng);
-    data[i].diem15P = toStr(data[i].diem15P);
-    data[i].diem1Tiet = toStr(data[i].diem1Tiet);
-    data[i].diemHK = toStr(data[i].diemHK);
-  }
-  return data;
 }
 export async function editTranscript(request) {
   let response;
@@ -453,78 +582,191 @@ export async function editTranscript(request) {
   params.append("diem1Tiet", JSON.stringify(request.diem1Tiet));
   params.append("diemHK", JSON.stringify(request.diemHK));
   params.append("token", localStorage.getItem("accessToken"));
-  if (!request.maBD) {
-    params.append("maMH", JSON.stringify(request.maMH));
-    params.append("maQTH", JSON.stringify(request.maQTH));
-    response = await axios.post(`${BACKEND_DOMAIN}/api/bang-diem`, params, {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
-  } else {
-    response = await axios.put(
-      `${BACKEND_DOMAIN}/api/bang-diem/${request.maBD}`,
-      params,
-      {
+  try {
+    if (!request.maBD) {
+      params.append("maMH", JSON.stringify(request.maMH));
+      params.append("maQTH", JSON.stringify(request.maQTH));
+      response = await axios.post(`${BACKEND_DOMAIN}/api/bang-diem`, params, {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
-      }
-    );
-  }
-  const data = await response.data;
-  if (response.status === 401) {
-    throw new Error("Chưa đăng nhập");
-  }
+      });
+    } else {
+      response = await axios.put(
+        `${BACKEND_DOMAIN}/api/bang-diem/${request.maBD}`,
+        params,
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
+    }
+    const data = await response.data;
 
-  for (var i = 0; i < data.length; i++) {
-    data[i].id = data[i].maHS;
+    for (var i = 0; i < data.length; i++) {
+      data[i].id = data[i].maHS;
+    }
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
+    throw new Error("Lỗi server");
   }
-  return data;
 }
 // Tất cả lớp, học kì, môn học
 export async function getAllClassesSemSub() {
-  const response = await axios.get(`${BACKEND_DOMAIN}/api/lop-hk-mh`, {
-    headers: {
-      Authorization: "Bearer " + localStorage.getItem("accessToken"),
-    },
-  });
-  const data = await response.data;
-  if (response.status === 401) {
-    throw new Error("Chưa đăng nhập");
+  try {
+    const response = await axios.get(`${BACKEND_DOMAIN}/api/lop-hk-mh`, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+    });
+    const data = await response.data;
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
+    throw new Error("Lỗi server");
   }
-
-  return data;
 }
-// Tất cả lớp, môn học
+//  Tất cả học kì
+export async function getAllSems() {
+  try {
+    const response = await axios.get(`${BACKEND_DOMAIN}/api/hk`, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+    });
+    const data = await response.data;
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
+    throw new Error("Lỗi server");
+  }
+}
+// Báo cáo tổng kết môn
+export async function getTKMByForegin(request) {
+  try {
+    const response = await axios.get(
+      `${BACKEND_DOMAIN}/api/tkm/${request.maHK}/${request.maMH}`,
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+      }
+    );
+    const data = await response.data;
+    for (var i = 0; i < data.length; i++) {
+      data[i].id = data[i].maTKM;
+    }
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
+    throw new Error("Lỗi server");
+  }
+}
+export async function updateTKMByForeign(request) {
+  try {
+    const response = await axios.put(
+      `${BACKEND_DOMAIN}/api/tkm/${request.maHK}/${request.maMH}`,
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+      }
+    );
+    const data = await response.data;
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
+    throw new Error("Lỗi server");
+  }
+}
+// Báo cáo tổng kết học kỳ
+export async function getTKHKByForegin(request) {
+  try {
+    const response = await axios.get(
+      `${BACKEND_DOMAIN}/api/tkhk/${request.maHK}`,
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+      }
+    );
+    const data = await response.data;
+    for (var i = 0; i < data.length; i++) {
+      data[i].id = data[i].maTKHK;
+    }
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
+    throw new Error("Lỗi server");
+  }
+}
+export async function updateTKHKByForeign(request) {
+  try {
+    const response = await axios.put(
+      `${BACKEND_DOMAIN}/api/tkhk/${request.maHK}`,
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+      }
+    );
+    const data = await response.data;
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
+    throw new Error("Lỗi server");
+  }
+}
 // Tham số
 export async function getAllParams() {
-  const response = await axios.get(`${BACKEND_DOMAIN}/api/tham-so`, {
-    headers: {
-      Authorization: "Bearer " + localStorage.getItem("accessToken"),
-    },
-  });
-  const data = await response.data;
-  if (response.status === 401) {
-    throw new Error("Chưa đăng nhập");
+  try {
+    const response = await axios.get(`${BACKEND_DOMAIN}/api/tham-so`, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+    });
+    const data = await response.data;
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
+    throw new Error("Lỗi server");
   }
-
-  return data;
 }
 export async function editParams(request) {
   let params = new URLSearchParams();
   params.append("thamSo", JSON.stringify(request));
-  const response = await axios.put(`${BACKEND_DOMAIN}/api/tham-so`, params, {
-    headers: {
-      Authorization: "Bearer " + localStorage.getItem("accessToken"),
-    },
-  });
-  const data = await response.data;
-  if (response.status === 401) {
-    throw new Error("Chưa đăng nhập");
+  try {
+    const response = await axios.put(`${BACKEND_DOMAIN}/api/tham-so`, params, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+    });
+    const data = await response.data;
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
+    throw new Error("Lỗi server");
   }
-
-  return data;
 }
 // Người dùng
 export async function login(request) {
@@ -712,6 +954,32 @@ export async function editProfile(request) {
   try {
     const response = await axios.put(
       `${BACKEND_DOMAIN}/api/profile/${request.id}`,
+      params
+    );
+    const data = await response.data;
+
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
+    if (error.response.status === 422) {
+      throw new Error(
+        error.response.data.message ||
+          "Vui lòng kiểm tra thông tin các trường đã nhập"
+      );
+    }
+    throw new Error("Lỗi server");
+  }
+}
+export async function editPassword(request) {
+  var params = new URLSearchParams();
+  params.append("matKhauCu", request.matKhauCu);
+  params.append("matKhauMoi", request.matKhauMoi);
+  params.append("token", localStorage.getItem("accessToken"));
+  try {
+    const response = await axios.put(
+      `${BACKEND_DOMAIN}/api/change-password/${request.id}`,
       params
     );
     const data = await response.data;

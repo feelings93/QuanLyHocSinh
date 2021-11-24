@@ -11,7 +11,7 @@ const ClassItem = (props) => {
   const history = useHistory();
   const { url } = useRouteMatch();
   const moveToEditClassHandler = () => {
-    history.push(`${url}/${props.class.id}`);
+    history.push(`${url}/${props.class.id}?maHK=${props.hk.maHK}`);
   };
   return (
     // <li>
@@ -57,7 +57,7 @@ const ClassItem = (props) => {
             mt="20px"
             color="text.primary"
           >
-            {40}
+            {props.class.siSo}
           </Typography>
           <Typography
             variant="subtitle1"

@@ -4,6 +4,8 @@ import IconButton from "@mui/material/IconButton";
 import { EditOutlined } from "@mui/icons-material";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress";
+
 import EditDiem from "./EditDiem";
 import useHttp from "../../hooks/use-http";
 import { getAllTranscripts } from "../../lib/api";
@@ -55,7 +57,6 @@ const TranscriptTable = (props) => {
   const hideEditDiemHandler = () => {
     setEditDiemDialogVisible(false);
   };
-  if (status === "pending") return <p>Đang tải ...</p>;
   if (error) return <p>{error}</p>;
   const columns = [
     { field: "id", headerName: "Mã HS", width: 80 },
@@ -65,20 +66,17 @@ const TranscriptTable = (props) => {
       field: "diemMieng",
       headerName: "Điểm miệng",
       width: 150,
-      editable: true,
     },
-    { field: "diem15P", headerName: "Điểm 15p", width: 150, editable: true },
+    { field: "diem15P", headerName: "Điểm 15p", width: 150 },
     {
       field: "diem1Tiet",
       headerName: "Điểm 1 tiết",
       width: 150,
-      editable: true,
     },
     {
       field: "diemHK",
       headerName: "Điểm học kì",
       width: 120,
-      editable: true,
     },
     {
       field: "diemTBM",
@@ -121,6 +119,21 @@ const TranscriptTable = (props) => {
     },
   ];
 
+  if (status === "pending")
+    return (
+      <div
+        style={{
+          height: "auto",
+          minHeight: "500px",
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <CircularProgress />
+      </div>
+    );
   return (
     <div style={{ height: "auto", minHeight: "500px", width: "100%" }}>
       {selectedList.length > 0 && (

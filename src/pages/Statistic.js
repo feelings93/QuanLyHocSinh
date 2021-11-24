@@ -6,12 +6,24 @@ import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import BCMonHoc from "../components/statistic/bcMonHoc";
 import BCHocKy from "../components/statistic/bcHocKy";
+import useHttp from "../hooks/use-http";
+import { getAllClassesSemSub } from "../lib/api";
+import Loading from "../components/UI/Loading";
 const Statistic = () => {
+  const { sendRequest, status, error, data } = useHttp(
+    getAllClassesSemSub,
+    true
+  );
+  React.useEffect(() => {
+    sendRequest();
+  }, [sendRequest]);
   const [value, setValue] = React.useState("1");
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+  if (status === "pending") return <Loading />;
+  if (error) return <p>{error}</p>;
   return (
     <Box sx={{ width: "100%" }}>
       <TabContext value={value}>
@@ -21,13 +33,17 @@ const Statistic = () => {
             <Tab label="Báo cáo theo học kì" value="2" />
           </TabList>
         </Box>
-        <TabPanel TabPanel value="1">
+        <TabPanel value="1">
           <Box>
-            <BCMonHoc></BCMonHoc>
+            <BCMonHoc
+              lop={data.lop}
+              hocKy={data.hocKy}
+              monHoc={data.monHoc}
+            ></BCMonHoc>
           </Box>
         </TabPanel>
         <TabPanel value="2">
-          <BCHocKy></BCHocKy>
+          <BCHocKy lop={data.lop} hocKy={data.hocKy}></BCHocKy>
         </TabPanel>
       </TabContext>
     </Box>

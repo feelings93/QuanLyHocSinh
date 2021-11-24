@@ -241,7 +241,11 @@ const StudentOfClassTable = (props) => {
             </Grid>
           </Grid>
 
-          <Button sx={{ minWidth: "120px" }} variant="outlined">
+          <Button
+            onClick={props.onShowEditCanBo}
+            sx={{ minWidth: "120px" }}
+            variant="outlined"
+          >
             Chỉnh sửa
           </Button>
         </Toolbar>
