@@ -24,6 +24,7 @@ const initChartOptions = {
     color: ["#6ab04c", "#2980b9"],
     chart: {
       background: "transparent",
+      id: "hey",
     },
     dataLabels: {
       enabled: false,
@@ -169,7 +170,10 @@ const ChartYear = (props) => {
           },
         ]);
         const newOpts = { ...initChartOptions.options };
-        newOpts.xaxis.categories = data.map((x) => x.namHoc);
+        newOpts.xaxis = {
+          ...newOpts.xaxis,
+          categories: data.map((x) => x.namHoc),
+        };
         setOptions(newOpts);
       }
     }
