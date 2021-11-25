@@ -11,6 +11,34 @@ const toStr = (arr) => {
   }
   return res.trim();
 };
+// Tổng quan
+export async function getOverview() {
+  try {
+    const response = await axios.get(`${BACKEND_DOMAIN}/api/tong-quan`, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+    });
+    const data = await response.data;
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) window.location.reload();
+  }
+}
+export async function getDatRot() {
+  try {
+    const response = await axios.get(`${BACKEND_DOMAIN}/api/dat-rot`, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+    });
+    const data = await response.data;
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) window.location.reload();
+    throw new Error("Lỗi server");
+  }
+}
 // Học sinh
 export async function getAllStudents() {
   try {
@@ -26,7 +54,7 @@ export async function getAllStudents() {
     }
     return data;
   } catch (error) {
-    window.location.reload();
+    if (error.response.status === 401) window.location.reload();
   }
 }
 export async function getStudentById(id) {
@@ -43,6 +71,26 @@ export async function getStudentById(id) {
     if (error.response.status === 401) {
       throw new Error(error.response.data.message || "Chưa đăng nhập");
     }
+  }
+}
+export async function getTopStudents(request) {
+  try {
+    const response = await axios.get(
+      `${BACKEND_DOMAIN}/api/top-hs/${request.maHK}`,
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+      }
+    );
+    const data = await response.data;
+
+    for (var i = 0; i < data.length; i++) {
+      data[i].id = data[i].maHS;
+    }
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) window.location.reload();
   }
 }
 export async function addStudent(request) {
@@ -156,7 +204,26 @@ export async function getAllClasses(maHK) {
     }
   }
 }
+export async function getTopClasses(request) {
+  try {
+    const response = await axios.get(
+      `${BACKEND_DOMAIN}/api/top-lop/${request.maHK}`,
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+      }
+    );
+    const data = await response.data;
 
+    for (var i = 0; i < data.length; i++) {
+      data[i].id = data[i].maTKHK;
+    }
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) window.location.reload();
+  }
+}
 export async function addClass(request) {
   var formData = new FormData();
   formData.append("tenLop", request.tenLop);

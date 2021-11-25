@@ -1,48 +1,34 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Grid";
-import Breadcrumbs from "@mui/material/Breadcrumbs";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
 import React, { useEffect } from "react";
 import useHttp from "../../hooks/use-http";
-import { getAllStudents } from "../../lib/api";
+import { getTopClasses } from "../../lib/api";
 import TopClassTable from "./TopClassTable";
+import Loading from "../UI/Loading";
 
-const TopClassList = () => {
-  const { sendRequest, status, data, error } = useHttp(getAllStudents, true);
+const TopClassList = (props) => {
+  const { sendRequest, status, data, error } = useHttp(getTopClasses, true);
+  const [hocKy, setHocKy] = React.useState(props.hk[0]);
 
   useEffect(() => {
-    sendRequest();
-  }, [sendRequest]);
+    if (hocKy !== "") {
+      sendRequest({ maHK: hocKy.maHK });
+    }
+  }, [sendRequest, hocKy]);
 
   if (status === "pending") {
-    return (
-      <Box
-        sx={{
-          width: "100%",
-          minHeight: "calc(100vh - 48px)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
+    return <Loading />;
   }
-  if (error) {
-    return <p className="centered focused">{error}</p>;
-  }
-  if (status === "completed" && (!data || data.length === 0)) {
-    return <p>Không có</p>;
+  if (status === "completed") {
+    if (error) {
+      return <p className="centered focused">{error}</p>;
+    }
   }
   return (
     <>
-      <Breadcrumbs mb="16px" aria-label="breadcrumb">
-        {/* <Link underline="hover" color="inherit" href="/students">
-          Học sinh
-        </Link> */}
-      </Breadcrumbs>
       <Box
         mb="16px"
         sx={{
@@ -54,14 +40,26 @@ const TopClassList = () => {
         <Typography variant="h6" component="h2">
           Xếp hạng lớp
         </Typography>
+        <TextField
+          label="Học kỳ"
+          sx={{ minWidth: "120px" }}
+          id="semester"
+          size="small"
+          select
+          value={hocKy}
+          onChange={(event) => {
+            setHocKy(event.target.value);
+          }}
+        >
+          {props.hk.map((x) => (
+            <MenuItem key={x.maHK} value={x}>
+              {x.tenHK}
+            </MenuItem>
+          ))}
+        </TextField>
       </Box>
 
-      <Grid
-        container
-        sx={{
-          boxShadow: "0px 0px  30px 5px rgba(0, 0, 0, 0.08)",
-        }}
-      >
+      <Grid container>
         <Grid item xs={4}>
           <TopClassTable data={data} />
         </Grid>

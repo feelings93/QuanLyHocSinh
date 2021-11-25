@@ -1,23 +1,23 @@
 import React, { useEffect } from "react";
 import StatusCard from "../components/status-card/StatusCard";
-import statusCards from "../assets/JsonData/status-card-data.json";
 import TopStudentList from "../components/topStudent/TopStudentList";
 import TopClassList from "../components/topClass/TopClassList";
 import Chart from "react-apexcharts";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import usehttp from "../hooks/use-http";
-import { getAllStudents } from "../lib/api";
+import { getAllSems, getOverview, getDatRot } from "../lib/api";
+import Loading from "../components/UI/Loading";
 
-const chartOptions = {
+const initChartOptions = {
   series: [
     {
       name: "Học sinh lên lớp",
-      data: [120, 140, 100, 190, 120, 200],
+      data: [],
     },
     {
       name: "Học sinh ở lại",
-      data: [40, 30, 70, 80, 40, 16],
+      data: [],
     },
   ],
   options: {
@@ -32,7 +32,8 @@ const chartOptions = {
       curve: "smooth",
     },
     xaxis: {
-      categories: ["2018", "2019", "2020", "2021", "2022", "2023"],
+      categories: [],
+      // tickPlacement: "between",
     },
     legend: {
       position: "top",
@@ -43,16 +44,15 @@ const chartOptions = {
   },
 };
 
-const Home = (props) => {
-  const { sendRequest, status, data, error } = usehttp(getAllStudents, true);
+const Home = () => {
+  const { sendRequest, status, data, error } = usehttp(getAllSems, true);
   useEffect(() => {
     sendRequest();
   }, [sendRequest]);
+  if (status === "pending") return <Loading />;
+
   if (error) {
     return <p className="centered focused">{error}</p>;
-  }
-  if (status === "completed" && (!data || data.length === 0)) {
-    return <p>Không có</p>;
   }
   return (
     <Grid
@@ -63,37 +63,12 @@ const Home = (props) => {
       style={{ padding: "20px" }}
     >
       <Grid item sm={6} xs={4}>
-        <Grid container rowSpacing={4} columnSpacing={3}>
-          {statusCards.map((item, index) => (
-            <Grid item sm={6} xs={4} key={index}>
-              <StatusCard
-                icon={item.icon}
-                count={item.count}
-                title={item.title}
-              />
-            </Grid>
-          ))}
-        </Grid>
+        <OverviewList />
       </Grid>
       <Grid item sm={6} xs={4}>
-        <Box
-          height="100%"
-          width="100%"
-          sx={{
-            boxShadow: 3,
-            borderRadius: 4,
-            backgroundColor: "#fff",
-          }}
-        >
-          <Chart
-            options={chartOptions.options}
-            series={chartOptions.series}
-            type="line"
-            height="100%"
-          />
-        </Box>
+        <ChartYear />
       </Grid>
-      <Grid item sm={4} xs={4}>
+      <Grid item sm={5} xs={4}>
         <Box
           style={{ padding: "20px" }}
           height="100%"
@@ -104,10 +79,10 @@ const Home = (props) => {
             backgroundColor: "#fff",
           }}
         >
-          <TopClassList></TopClassList>
+          <TopClassList hk={data}></TopClassList>
         </Box>
       </Grid>
-      <Grid item sm={8} xs={4}>
+      <Grid item sm={7} xs={4}>
         <Box
           style={{ padding: "20px" }}
           height="100%"
@@ -118,10 +93,99 @@ const Home = (props) => {
             backgroundColor: "#fff",
           }}
         >
-          <TopStudentList></TopStudentList>
+          <TopStudentList hk={data}></TopStudentList>
         </Box>
       </Grid>
     </Grid>
+  );
+};
+
+const OverviewList = (props) => {
+  const { sendRequest, status, data, error } = usehttp(getOverview, true);
+  useEffect(() => {
+    sendRequest();
+  }, [sendRequest]);
+  // if (status === "pending") return <Loading />;
+  if (status === "completed") {
+    if (error) {
+      return <h4>{error}</h4>;
+    }
+  }
+  return (
+    <Grid container rowSpacing={4} columnSpacing={3}>
+      <Grid item sm={6} xs={4}>
+        <StatusCard
+          icon={"bx bxs-school"}
+          count={status === "pending" ? 0 : data.soLopHoc}
+          title={"Lớp học"}
+        />
+      </Grid>
+      <Grid item sm={6} xs={4}>
+        <StatusCard
+          icon={"bx bx-book-reader"}
+          count={status === "pending" ? 0 : data.soGV}
+          title={"Giáo viên"}
+        />
+      </Grid>
+      <Grid item sm={6} xs={4}>
+        <StatusCard
+          icon={"bx bx-user-pin"}
+          count={status === "pending" ? 0 : data.soHocSinh}
+          title={"Học sinh"}
+        />
+      </Grid>
+      <Grid item sm={6} xs={4}>
+        <StatusCard
+          icon={"bx bx-book-content"}
+          count={status === "pending" ? 0 : data.soMonHoc}
+          title={"Môn học"}
+        />
+      </Grid>
+    </Grid>
+  );
+};
+
+const ChartYear = (props) => {
+  const { sendRequest, status, data, error } = usehttp(getDatRot, true);
+  const [options, setOptions] = React.useState(initChartOptions.options);
+  const [series, setSeries] = React.useState(initChartOptions.series);
+
+  useEffect(() => {
+    sendRequest();
+  }, [sendRequest]);
+  useEffect(() => {
+    if (status === "completed") {
+      if (error) {
+        return <h4>{error}</h4>;
+      } else if (data) {
+        setSeries([
+          {
+            name: "Học sinh lên lớp",
+            data: data.map((x) => x.soLuongDat),
+          },
+          {
+            name: "Học sinh ở lại",
+            data: data.map((x) => x.soLuongRot),
+          },
+        ]);
+        const newOpts = { ...initChartOptions.options };
+        newOpts.xaxis.categories = data.map((x) => x.namHoc);
+        setOptions(newOpts);
+      }
+    }
+  }, [data, error, status]);
+  return (
+    <Box
+      height="100%"
+      width="100%"
+      sx={{
+        boxShadow: 3,
+        borderRadius: 4,
+        backgroundColor: "#fff",
+      }}
+    >
+      <Chart options={options} series={series} type="bar" height="100%" />
+    </Box>
   );
 };
 
