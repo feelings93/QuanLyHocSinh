@@ -3,11 +3,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
 import Box from "@mui/material/Box";
 
-import {
-  DeleteOutlined,
-  DetailsOutlined,
-  EditOutlined,
-} from "@mui/icons-material";
+import { DeleteOutlined, EditOutlined } from "@mui/icons-material";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { useRouteMatch, useHistory } from "react-router-dom";
@@ -93,13 +89,15 @@ const StudentsTable = (props) => {
       align: "center",
       width: 150,
       renderCell: (params) => (
-        <IconButton
-          title="Học bạ"
-          variant="dark"
+        <Button
+          sx={{ textTransform: "none" }}
+          size="small"
+          color="secondary"
+          variant="contained"
           onClick={moveToProfileHandler.bind(null, params.id)}
         >
-          <DetailsOutlined />
-        </IconButton>
+          Học bạ
+        </Button>
       ),
     },
   ];

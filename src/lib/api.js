@@ -73,6 +73,39 @@ export async function getStudentById(id) {
     }
   }
 }
+export async function getDetailStudentById(id) {
+  try {
+    const response = await axios.get(
+      `${BACKEND_DOMAIN}/api/chi-tiet-hs/${id}`,
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+      }
+    );
+
+    const data = await response.data;
+    for (var i = 0; i < data.qth.length; i++) {
+      for (var j = 0; j < data.qth[i].bangDiem.length; j++) {
+        data.qth[i].bangDiem[j].diemMieng = toStr(
+          data.qth[i].bangDiem[j].diemMieng
+        );
+        data.qth[i].bangDiem[j].diem15P = toStr(
+          data.qth[i].bangDiem[j].diem15P
+        );
+        data.qth[i].bangDiem[j].diem1Tiet = toStr(
+          data.qth[i].bangDiem[j].diem1Tiet
+        );
+        data.qth[i].bangDiem[j].diemHK = toStr(data.qth[i].bangDiem[j].diemHK);
+      }
+    }
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      throw new Error(error.response.data.message || "Chưa đăng nhập");
+    }
+  }
+}
 export async function getTopStudents(request) {
   try {
     const response = await axios.get(
