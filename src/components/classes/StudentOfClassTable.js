@@ -251,6 +251,13 @@ const StudentOfClassTable = (props) => {
         </Toolbar>
       )}
       <DataGrid
+        localeText={{
+          toolbarExport: "Xuất",
+          toolbarExportLabel: "Xuất",
+          toolbarExportCSV: "Tải về dạng CSV",
+          toolbarExportPrint: "In",
+          noRowsLabel: "Không có dữ liệu",
+        }}
         className="mh-500 bt-none"
         hideFooterSelectedRowCount
         pageSize={pageSize}

@@ -109,6 +109,13 @@ const CoursesTable = (props) => {
       )}
       {selectedList.length === 0 && <Toolbar></Toolbar>}
       <DataGrid
+        localeText={{
+          toolbarExport: "Xuất",
+          toolbarExportLabel: "Xuất",
+          toolbarExportCSV: "Tải về dạng CSV",
+          toolbarExportPrint: "In",
+          noRowsLabel: "Không có dữ liệu",
+        }}
         className={`${classes.root} mh-500 bt-none`}
         disableCellFocusOutline
         // className=""

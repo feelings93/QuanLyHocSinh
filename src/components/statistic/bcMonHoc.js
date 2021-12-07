@@ -8,7 +8,12 @@ import Button from "@mui/material/Button";
 
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridToolbarContainer,
+  GridToolbarExport,
+  gridClasses,
+} from "@mui/x-data-grid";
 // import { IconButton } from "@mui/material";
 // import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import useHttp from "../../hooks/use-http";
@@ -17,6 +22,22 @@ import Loading from "../UI/Loading";
 import swal from "sweetalert";
 import { Backdrop } from "@mui/material";
 
+function CustomToolbar() {
+  return (
+    <GridToolbarContainer className={gridClasses.toolbarContainer}>
+      <GridToolbarExport
+        printOptions={{
+          hideFooter: true,
+          hideToolbar: true,
+        }}
+        title="Xuất"
+        csvOptions={{
+          utf8WithBom: true,
+        }}
+      />
+    </GridToolbarContainer>
+  );
+}
 const BCMonHoc = (props) => {
   const { sendRequest, status, data, error } = useHttp(getTKMByForegin);
   const {
@@ -147,7 +168,14 @@ const BCMonHoc = (props) => {
       <Grid item sm={12}>
         <DataGrid
           components={{
-            Toolbar: GridToolbar,
+            Toolbar: CustomToolbar,
+          }}
+          localeText={{
+            toolbarExport: "Xuất",
+            toolbarExportLabel: "Xuất",
+            toolbarExportCSV: "Tải về dạng CSV",
+            toolbarExportPrint: "In",
+            noRowsLabel: "Không có dữ liệu",
           }}
           className="mh-500 bt-none"
           hideFooterSelectedRowCount

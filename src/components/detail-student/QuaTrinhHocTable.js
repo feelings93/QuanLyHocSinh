@@ -14,6 +14,10 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { Chip } from "@mui/material";
 
+function ContainerTable() {
+  return <Paper />;
+}
+
 function Row(props) {
   const { row } = props;
   const [open, setOpen] = React.useState(false);
@@ -118,7 +122,7 @@ function Row(props) {
 
 export default function QuaTrinhHocTable(props) {
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Box}>
       <Table aria-label="collapsible table">
         <TableHead>
           <TableRow>

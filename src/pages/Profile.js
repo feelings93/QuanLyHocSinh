@@ -27,7 +27,14 @@ const Profile = () => {
     <>
       <Grid spacing={2} container>
         <Grid item xs={12} md={4}>
-          <Paper elevation={4} sx={{ padding: 2 }}>
+          <Paper
+            elevation={0}
+            sx={{
+              boxShadow: "0px 0px  30px 3px rgba(0, 0, 0, 0.08)",
+              padding: 3,
+              borderRadius: 4,
+            }}
+          >
             <Stack spacing={1} direction="column">
               <Typography variant="h6">Thông tin cơ bản</Typography>
               <Divider />

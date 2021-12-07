@@ -110,7 +110,13 @@ const SubjectsTable = (props) => {
       <DataGrid
         className={`${classes.root} mh-500 bt-none`}
         disableCellFocusOutline
-        // className=""
+        localeText={{
+          toolbarExport: "Xuất",
+          toolbarExportLabel: "Xuất",
+          toolbarExportCSV: "Tải về dạng CSV",
+          toolbarExportPrint: "In",
+          noRowsLabel: "Không có dữ liệu",
+        }}
         hideFooterSelectedRowCount
         pageSize={pageSize}
         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
