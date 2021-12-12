@@ -65,20 +65,12 @@ const Header = (props) => {
         position="static"
       >
         <Toolbar sx={{ color: "#949db2" }} variant="dense">
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton>
           <Avatar
             onClick={handleClick}
             aria-describedby={id}
             sx={{ ml: "auto", padding: 0, cursor: "pointer" }}
             alt="Avatar"
-            src="https://vnn-imgs-f.vgcloud.vn/2020/04/13/23/suzy-tinh-dau-quoc-dan-so-huu-khoi-tai-san-chuc-trieu-do.jpg"
+            src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
           />
           <Menu
             anchorEl={anchorEl}
@@ -119,7 +111,7 @@ const Header = (props) => {
             <Stack spacing={2}>
               <Typography variant="h6">Cá nhân</Typography>
               <Stack mt={2} direction="row">
-                <Avatar src="https://vnn-imgs-f.vgcloud.vn/2020/04/13/23/suzy-tinh-dau-quoc-dan-so-huu-khoi-tai-san-chuc-trieu-do.jpg" />{" "}
+                <Avatar src="https://cdn-icons-png.flaticon.com/512/149/149071.png" />{" "}
                 <Stack direction="column" sx={{ minWidth: "200px" }}>
                   <Typography variant="h6">{props.user.name}</Typography>
                   <Typography variant="subtitle1" color="text.secondary">

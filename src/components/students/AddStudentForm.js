@@ -43,7 +43,7 @@ const AddStudentForm = (props) => {
     <Dialog open={props.open} onClose={props.onClose}>
       <form onSubmit={handleSubmit(submitFormHandler)}>
         {status === "pending" && <LinearLoading />}
-        <DialogTitle>Thêm chương trình học</DialogTitle>
+        <DialogTitle>Thêm học sinh</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ width: "300px" }}>
             <Controller
