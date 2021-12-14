@@ -83,9 +83,6 @@ const StudentsList = () => {
   if (error) {
     return <p className="centered focused">{error}</p>;
   }
-  if (status === "completed" && (!data || data.length === 0)) {
-    return <p>Không có</p>;
-  }
   return (
     <>
       <Breadcrumbs mb="16px" aria-label="breadcrumb">
