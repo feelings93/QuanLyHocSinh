@@ -172,7 +172,7 @@ function App() {
                         <Route exact path="/statistic">
                           <Statistic />
                         </Route>
-                        {data.maNhom === 0 || data.maNhom === 1 ? (
+                        {data.maNhom === 1 && (
                           <>
                             <Route exact path="/users">
                               <Users />
@@ -181,8 +181,13 @@ function App() {
                               <Regulation />
                             </Route>
                           </>
-                        ) : (
-                          <></>
+                        )}
+                        {data.maNhom === 2 && (
+                          <>
+                            <Route exact path="/rules">
+                              <Regulation />
+                            </Route>
+                          </>
                         )}
                       </Switch>
                     </Suspense>

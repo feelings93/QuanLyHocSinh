@@ -42,7 +42,7 @@ const TAB_ITEMShi = [
 ];
 const SideBar = (props) => {
   let TAB_ITEMS;
-  if (props.user.maNhom === 1 || props.user.maNhom === 2)
+  if (props.user.maNhom === 1)
     TAB_ITEMS = [
       ...TAB_ITEMShi,
       {
@@ -54,6 +54,15 @@ const SideBar = (props) => {
         link: "/users",
         title: "Người dùng",
         icon: "person",
+      },
+    ];
+  else if (props.user.maNhom === 2)
+    TAB_ITEMS = [
+      ...TAB_ITEMShi,
+      {
+        link: "/rules",
+        title: "Quy định",
+        icon: "chat",
       },
     ];
   else TAB_ITEMS = [...TAB_ITEMShi];
