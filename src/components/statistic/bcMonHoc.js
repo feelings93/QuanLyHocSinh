@@ -3,44 +3,116 @@ import Grid from "@mui/material/Grid";
 import React from "react";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
+import Stack from "@mui/material/Stack";
+import Button from "@mui/material/Button";
+
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { IconButton } from "@mui/material";
-import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
+import {
+  DataGrid,
+  GridToolbarContainer,
+  GridToolbarExport,
+  gridClasses,
+} from "@mui/x-data-grid";
+// import { IconButton } from "@mui/material";
+// import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
+import useHttp from "../../hooks/use-http";
+import { getTKMByForegin, updateTKMByForeign } from "../../lib/api";
+import Loading from "../UI/Loading";
+import swal from "sweetalert";
+import { Backdrop } from "@mui/material";
 
-const BCMonHoc = () => {
-  const columns = [
-    { field: "id", headerName: "ID", width: 100 },
-    { field: "tenLop", headerName: "Lớp", width: 200 },
-    { field: "siSo", headerName: "Sĩ số", width: 200 },
-    { field: "soluongDat", headerName: "Số lượng đạt", width: 200 },
-    { field: "tileDat", headerName: "Tỉ lệ đạt", width: 200 },
-    { field: "ghiChu", headerName: "Ghi chú", width: 200 },
-  ];
+function CustomToolbar() {
+  return (
+    <GridToolbarContainer className={gridClasses.toolbarContainer}>
+      <GridToolbarExport
+        printOptions={{
+          hideFooter: true,
+          hideToolbar: true,
+        }}
+        title="Xuất"
+        csvOptions={{
+          utf8WithBom: true,
+        }}
+      />
+    </GridToolbarContainer>
+  );
+}
+const BCMonHoc = (props) => {
+  const { sendRequest, status, data, error } = useHttp(getTKMByForegin);
+  const {
+    sendRequest: sendRequestUpdate,
+    status: statusUpdate,
+    data: dataUpdate,
+    error: errorUpdate,
+  } = useHttp(updateTKMByForeign);
 
-  const rows = [
-    { id: 1, tenLop: "10A1", siSo: 40, soluongDat: 35, tileDat: "90%" },
-    { id: 2, tenLop: "10A1", siSo: 40, soluongDat: 35, tileDat: "90%" },
-    { id: 3, tenLop: "10A1", siSo: 40, soluongDat: 35, tileDat: "90%" },
-    { id: 4, tenLop: "10A1", siSo: 40, soluongDat: 35, tileDat: "90%" },
-    { id: 5, tenLop: "10A1", siSo: 40, soluongDat: 35, tileDat: "90%" },
-    { id: 6, tenLop: "10A1", siSo: 40, soluongDat: 35, tileDat: "90%" },
-    { id: 7, tenLop: "10A1", siSo: 40, soluongDat: 35, tileDat: "90%" },
-  ];
   const [subject, setSubject] = React.useState("");
   const [semester, setSemester] = React.useState("");
   const [pageSize, setPageSize] = React.useState(15);
+  const columns = [
+    { field: "id", headerName: "ID", width: 100 },
+    {
+      field: "tenLop",
+      headerName: "Lớp",
+      width: 200,
+      valueGetter: (params) => {
+        return props.lop.find(
+          (x) => params.row.maLop.toString() === x.maLop.toString()
+        ).tenLop;
+      },
+    },
+    { field: "siSo", headerName: "Sĩ số", width: 200 },
+    { field: "soLuongDat", headerName: "Số lượng đạt", width: 200 },
+    { field: "tiLe", headerName: "Tỉ lệ đạt", width: 200 },
+    // { field: "ghiChu", headerName: "Ghi chú", width: 200 },
+  ];
+  const [tongKetMons, setTongKetMons] = React.useState([]);
+  React.useEffect(() => {
+    if (subject !== "" && semester !== "")
+      sendRequest({ maMH: subject.maMH, maHK: semester.maHK });
+  }, [semester, sendRequest, subject]);
+  React.useEffect(() => {
+    if (status === "completed" && data) {
+      setTongKetMons(data);
+    }
+  }, [data, status]);
+  React.useEffect(() => {
+    if (statusUpdate === "completed") {
+      if (dataUpdate) {
+        swal(
+          "Cập nhật thành công!",
+          "Bạn đã cập nhật báo cáo thành công",
+          "success"
+        );
 
+        setTongKetMons(
+          dataUpdate.map((x) => {
+            return { ...x, id: x.maTKM };
+          })
+        );
+      } else if (errorUpdate) swal("Đã có lỗi xảy ra", errorUpdate, "error");
+    }
+  }, [statusUpdate, dataUpdate, errorUpdate]);
   const SubjectHandleChange = (event) => {
     setSubject(event.target.value);
   };
   const SemesterHandleChange = (event) => {
     setSemester(event.target.value);
   };
+  const updateBaoCaoHandler = () => {
+    if (subject === "" || semester === "") {
+      swal("Lỗi", "Vui lòng chọn đủ thông tin", "error");
+      return;
+    }
+    sendRequestUpdate({ maMH: subject.maMH, maHK: semester.maHK });
+  };
+  if (statusUpdate === "pending") return <Backdrop />;
+  if (status === "pending") return <Loading />;
+  if (error) return <p>{error}</p>;
   return (
-    <Grid container sm={12} rowSpacing={3}>
-      <Grid container item sm={1} sx={{ alignItems: "center" }}>
+    <Grid container rowSpacing={3}>
+      <Grid item sm={1} sx={{ alignItems: "center" }}>
         <Typography variant="h6" component="h6" sx={{ fontSize: "17px" }}>
           Lựa chọn:
         </Typography>
@@ -58,9 +130,11 @@ const BCMonHoc = () => {
             label="Môn học"
             onChange={SubjectHandleChange}
           >
-            <MenuItem value={10}>Tin học</MenuItem>
-            <MenuItem value={20}>Hoá học</MenuItem>
-            <MenuItem value={30}>Vật lý</MenuItem>
+            {props.monHoc.map((x) => (
+              <MenuItem key={x.maMH} value={x}>
+                {x.tenMH}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
         <FormControl size="small" sx={{ minWidth: "150px" }}>
@@ -72,21 +146,36 @@ const BCMonHoc = () => {
             label="Học kì"
             onChange={SemesterHandleChange}
           >
-            <MenuItem value={10}>1 (2020-2021)</MenuItem>
-            <MenuItem value={20}>2 (2020-2021)</MenuItem>
-            <MenuItem value={30}>1 (2021-2022)</MenuItem>
+            {props.hocKy.map((x) => (
+              <MenuItem key={x.maHK} value={x}>
+                {x.tenHK}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
       </Grid>
-      <Grid container item sm={6} sx={{ justifyContent: "flex-end" }}>
-        <IconButton color="primary" aria-label="add to shopping cart">
-          <LocalPrintshopOutlinedIcon />
-        </IconButton>
+      <Grid item sm={6}>
+        <Stack direction="row" sx={{ justifyContent: "flex-end" }}>
+          <Button
+            onClick={updateBaoCaoHandler}
+            variant="contained"
+            color="primary"
+          >
+            Cập nhật
+          </Button>
+        </Stack>
       </Grid>
       <Grid item sm={12}>
         <DataGrid
           components={{
-            Toolbar: GridToolbar,
+            Toolbar: CustomToolbar,
+          }}
+          localeText={{
+            toolbarExport: "Xuất",
+            toolbarExportLabel: "Xuất",
+            toolbarExportCSV: "Tải về dạng CSV",
+            toolbarExportPrint: "In",
+            noRowsLabel: "Không có dữ liệu",
           }}
           className="mh-500 bt-none"
           hideFooterSelectedRowCount
@@ -95,7 +184,7 @@ const BCMonHoc = () => {
           pagination
           disableColumnMenu
           disableSelectionOnClick
-          rows={rows}
+          rows={tongKetMons}
           rowsPerPageOptions={[5, 10, 20]}
           columns={columns}
         />

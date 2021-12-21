@@ -19,8 +19,8 @@ const checkedIcon = <CheckBoxIcon fontSize="small" />;
 const AddStudentToClassForm = (props) => {
   const { sendRequest, status, error, data } = useHttp(getStudentsEmpty, true);
   useEffect(() => {
-    sendRequest(1);
-  }, [sendRequest]);
+    sendRequest(props.maHK);
+  }, [sendRequest, props.maHK]);
   if (status === "pending") return <BackdropLoading />;
   if (error) return <p>{error}</p>;
   return (
@@ -30,7 +30,7 @@ const AddStudentToClassForm = (props) => {
         maLop={props.maLop}
         data={data}
         onClose={props.onClose}
-        onReload={props.onReload}
+        addStudents={props.addStudents}
       />
     </Dialog>
   );
@@ -49,7 +49,10 @@ const AddStudentToClassContent = (props) => {
           "Bạn đã thêm học sinh vào lớp thành công",
           "success"
         );
-        props.onReload();
+        const addedData = [...data].map((x) => {
+          return { ...x, id: x.maHS };
+        });
+        props.addStudents(addedData);
       } else if (error) swal("Đã có lỗi xảy ra", error, "error");
     }
   }, [data, error, status, props]);
@@ -81,7 +84,7 @@ const AddStudentToClassContent = (props) => {
           disableCloseOnSelect
           getOptionLabel={(option) => option.hoTen}
           renderOption={(props, option, { selected }) => (
-            <li {...props}>
+            <li {...props} key={option.id}>
               <Checkbox
                 icon={icon}
                 checkedIcon={checkedIcon}

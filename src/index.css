@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  font-family: "Roboto", sans-serif;
+  font-family: "Inter", "Roboto", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -71,7 +71,7 @@ ul {
 .col-6 {
   width: 50%;
 }
-.col-4{
+.col-4 {
   width: 33.33%;
 }
 .card {
@@ -111,17 +111,15 @@ ul {
 }
 
 @media only screen and (max-width: 500px) {
-  .row{
-      width: 158%;
+  .row {
+    width: 158%;
 
-      display: flex;
-      flex-wrap: wrap;
-      margin: 0 -5px;
-      align-items: center;
-    
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -5px;
+    align-items: center;
   }
-  .col-6{
-    width: 50%;    
+  .col-6 {
+    width: 50%;
   }
-
 }

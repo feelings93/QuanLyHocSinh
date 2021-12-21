@@ -13,16 +13,27 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { viVN } from "@mui/material/locale";
 import Users from "./pages/Users";
 import Login from "./pages/Login";
-const Home = React.lazy(() => import("./pages/Home"));
-const Students = React.lazy(() => import("./pages/Students"));
-const Classes = React.lazy(() => import("./pages/Classes"));
-const Courses = React.lazy(() => import("./pages/Courses"));
-const Transcript = React.lazy(() => import("./pages/Transcript"));
-const Statistic = React.lazy(() => import("./pages/Statistic"));
-const Regulation = React.lazy(() => import("./pages/Regulation"));
+import Home from "./pages/Home";
+import Students from "./pages/Students";
+import Classes from "./pages/Classes";
+import Courses from "./pages/Courses";
+import Transcript from "./pages/Transcript";
+import Statistic from "./pages/Statistic";
+import Regulation from "./pages/Regulation";
+
+// const Home = React.lazy(() => import("./pages/Home"));
+// const Students = React.lazy(() => import("./pages/Students"));
+// const Classes = React.lazy(() => import("./pages/Classes"));
+// const Courses = React.lazy(() => import("./pages/Courses"));
+// const Transcript = React.lazy(() => import("./pages/Transcript"));
+// const Statistic = React.lazy(() => import("./pages/Statistic"));
+// const Regulation = React.lazy(() => import("./pages/Regulation"));
 
 const theme = createTheme(
   {
+    typography: {
+      fontFamily: "Inter, Roboto, san-serif",
+    },
     palette: {
       primary: { main: "#03c9d7" },
       secondary: { main: "#fc9678" },
@@ -115,9 +126,14 @@ function App() {
           <Route path="/">
             {!error ? (
               <Box sx={{ display: "flex" }}>
-                <SideBar />
+                <SideBar user={data} />
                 <Box sx={{ flex: "1" }}>
-                  <Header nameUser={data.name} />
+                  <Header
+                    user={data}
+                    onReload={() => {
+                      setIsReload(true);
+                    }}
+                  />
                   <main>
                     <Suspense
                       fallback={
@@ -156,12 +172,23 @@ function App() {
                         <Route exact path="/statistic">
                           <Statistic />
                         </Route>
-                        <Route exact path="/users">
-                          <Users />
-                        </Route>
-                        <Route exact path="/rules">
-                          <Regulation />
-                        </Route>
+                        {data.maNhom === 1 && (
+                          <>
+                            <Route exact path="/users">
+                              <Users />
+                            </Route>
+                            <Route exact path="/rules">
+                              <Regulation />
+                            </Route>
+                          </>
+                        )}
+                        {data.maNhom === 2 && (
+                          <>
+                            <Route exact path="/rules">
+                              <Regulation />
+                            </Route>
+                          </>
+                        )}
                       </Switch>
                     </Suspense>
                   </main>

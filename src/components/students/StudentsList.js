@@ -7,29 +7,81 @@ import React, { useEffect } from "react";
 import useHttp from "../../hooks/use-http";
 import { getAllStudents } from "../../lib/api";
 import StudentsTable from "./StudentsTable";
-import { useHistory, useRouteMatch } from "react-router-dom";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
 import { Search } from "@mui/icons-material";
 import Loading from "../UI/Loading";
+import AddStudentForm from "./AddStudentForm";
+import EditStudentForm from "./EditStudentForm";
 const StudentsList = () => {
   const { sendRequest, status, data, error } = useHttp(getAllStudents, true);
-  const history = useHistory();
-  const { url } = useRouteMatch();
+  const [isAddStudentDialogVisible, setIsAddStudentDialogVisible] =
+    React.useState(false);
+  const [isEditStudentDialogVisible, setIsEditStudentDialogVisible] =
+    React.useState(false);
+  const [editStudent, setEditStudent] = React.useState(null);
+  const [allStudents, setAllStudents] = React.useState([]);
+  const [searchStudents, setSearchStudents] = React.useState([]);
+  const [query, setQuery] = React.useState("");
+
+  const updateStudent = (Student) => {
+    let newStudents = allStudents.map((x) =>
+      x.maHS !== Student.maHS ? x : Student
+    );
+    setAllStudents(newStudents);
+  };
+  const delStudents = (Students) => {
+    let newStudents = [...allStudents];
+    for (let i = 0; i < Students.length; i++) {
+      newStudents = newStudents.filter((x) => x.maHS !== Students[i]);
+    }
+    console.log(newStudents);
+    setAllStudents(newStudents);
+  };
+  const addStudent = (Student) => {
+    let newStudents = [...allStudents];
+    newStudents.push(Student);
+    setAllStudents(newStudents);
+  };
+  const showAddStudentHandler = () => {
+    setIsAddStudentDialogVisible(true);
+  };
+  const hideAddStudentHandler = () => {
+    setIsAddStudentDialogVisible(false);
+  };
+  const showEditStudentHandler = (Student) => {
+    setEditStudent(Student);
+
+    setIsEditStudentDialogVisible(true);
+  };
+  const hideEditStudentHandler = () => {
+    setIsEditStudentDialogVisible(false);
+  };
+
   useEffect(() => {
     sendRequest();
   }, [sendRequest]);
-  const addStudentHandler = () => {
-    history.push(url + "/add");
-  };
+  useEffect(() => {
+    if (status === "completed" && data) {
+      setAllStudents(data);
+    }
+  }, [data, status]);
+  useEffect(() => {
+    if (query === "" || !query) {
+      setSearchStudents(allStudents);
+    } else {
+      setSearchStudents(
+        allStudents.filter((x) =>
+          x.hoTen.toUpperCase().includes(query.toUpperCase())
+        )
+      );
+    }
+  }, [allStudents, query]);
   if (status === "pending") {
     return <Loading />;
   }
   if (error) {
     return <p className="centered focused">{error}</p>;
-  }
-  if (status === "completed" && (!data || data.length === 0)) {
-    return <p>Không có</p>;
   }
   return (
     <>
@@ -61,6 +113,10 @@ const StudentsList = () => {
             label="Tìm kiếm"
             variant="outlined"
             size="small"
+            value={query}
+            onChange={(event) => {
+              setQuery(event.target.value);
+            }}
             sx={{ marginRight: "8px" }}
             InputProps={{
               startAdornment: (
@@ -71,7 +127,7 @@ const StudentsList = () => {
             }}
           />
           <Button
-            onClick={addStudentHandler}
+            onClick={showAddStudentHandler}
             variant="contained"
             color="success"
           >
@@ -87,9 +143,28 @@ const StudentsList = () => {
         }}
       >
         <Grid item xs={12}>
-          <StudentsTable data={data} />
+          <StudentsTable
+            onShowEdit={showEditStudentHandler}
+            data={searchStudents}
+            delStudents={delStudents}
+          />
         </Grid>
       </Grid>
+      {isAddStudentDialogVisible && (
+        <AddStudentForm
+          open={isAddStudentDialogVisible}
+          addStudent={addStudent}
+          onClose={hideAddStudentHandler}
+        />
+      )}
+      {isEditStudentDialogVisible && (
+        <EditStudentForm
+          updateStudent={updateStudent}
+          editStudent={editStudent}
+          open={isEditStudentDialogVisible}
+          onClose={hideEditStudentHandler}
+        />
+      )}
     </>
   );
 };

@@ -22,7 +22,7 @@ const AddSubjectForm = (props) => {
           "Bạn đã thêm môn học mới thành công",
           "success"
         );
-        props.onReload();
+        props.addSubject({ ...data, id: data.maMH });
       } else if (error) swal("Đã có lỗi xảy ra", error, "error");
     }
   }, [data, error, status, props]);
@@ -45,6 +45,7 @@ const AddSubjectForm = (props) => {
         <DialogContent>
           <Stack spacing={2} sx={{ width: "200px" }}>
             <TextField
+              required
               value={enteredSubjectName}
               onChange={(event) => {
                 setEnteredSubjectName(event.target.value);
@@ -57,6 +58,7 @@ const AddSubjectForm = (props) => {
               variant="outlined"
             />
             <TextField
+              required
               value={enteredGrade}
               onChange={(event) => {
                 setEnteredGrade(event.target.value);

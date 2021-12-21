@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import Stack from "@mui/material/Stack";
@@ -7,31 +7,17 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import useHttp from "../../hooks/use-http";
-import { editSubject, getSubjectById } from "../../lib/api";
-import BackdropLoading from "../UI/BackdropLoading";
+import { editSubject } from "../../lib/api";
 import swal from "sweetalert";
 import LinearLoading from "../UI/LinearLoading";
 
 const EditSubjectForm = (props) => {
-  const {
-    sendRequest: getSubject,
-    error: errorGet,
-    data: dataGet,
-    status: statusGet,
-  } = useHttp(getSubjectById, true);
-  useEffect(() => {
-    getSubject(props.maMH);
-  }, [props.maMH, getSubject]);
-
-  if (statusGet === "pending") return <BackdropLoading />;
-  if (errorGet) return <p>errorGet</p>;
-
   return (
     <Dialog open={props.open} onClose={props.onClose}>
       <EditSubjectContent
-        onReload={props.onReload}
         onClose={props.onClose}
-        subject={dataGet}
+        subject={props.editSubject}
+        updateSubjects={props.updateSubjects}
       />
     </Dialog>
   );
@@ -39,6 +25,8 @@ const EditSubjectForm = (props) => {
 
 const EditSubjectContent = (props) => {
   const { sendRequest, status, error, data } = useHttp(editSubject);
+  const [enteredSubject, setEnteredSubject] = useState(props.subject.tenMH);
+  const [enteredPoint, setEnteredPoint] = useState(props.subject.diemDat);
   React.useEffect(() => {
     if (status === "completed") {
       props.onClose();
@@ -49,10 +37,14 @@ const EditSubjectContent = (props) => {
           "Bạn đã cập nhật môn học thành công!",
           "success"
         );
-        props.onReload();
+        props.updateSubjects({
+          ...props.subject,
+          tenMH: enteredSubject,
+          diemDat: enteredPoint,
+        });
       } else if (error) swal("Đã có lỗi xảy ra", error, "error");
     }
-  }, [data, error, status, props]);
+  }, [data, error, status, props, enteredPoint, enteredSubject]);
   const editSubjectSubmitHandler = (event) => {
     event.preventDefault();
     console.log({
@@ -66,8 +58,7 @@ const EditSubjectContent = (props) => {
       diemDat: enteredPoint,
     });
   };
-  const [enteredSubject, setEnteredSubject] = useState(props.subject.tenMH);
-  const [enteredPoint, setEnteredPoint] = useState(props.subject.diemDat);
+
   const subjectChangeHandler = (event) => {
     setEnteredSubject(event.target.value);
   };
@@ -81,6 +72,7 @@ const EditSubjectContent = (props) => {
       <DialogContent>
         <Stack spacing={2} sx={{ width: "200px" }}>
           <TextField
+            required
             value={enteredSubject}
             onChange={subjectChangeHandler}
             autoFocus
@@ -91,6 +83,7 @@ const EditSubjectContent = (props) => {
             variant="outlined"
           />
           <TextField
+            required
             value={enteredPoint}
             onChange={pointChangeHandler}
             margin="dense"

@@ -14,27 +14,49 @@ import { getAllSubjects } from "../../lib/api";
 import Loading from "../UI/Loading";
 const SubjectsList = () => {
   const { sendRequest, data, error, status } = useHttp(getAllSubjects, true);
-  const [isReload, setIsReload] = React.useState(true);
   React.useEffect(() => {
-    if (isReload === true) {
-      sendRequest();
-      setIsReload(false);
+    sendRequest();
+  }, [sendRequest]);
+  React.useEffect(() => {
+    if (status === "completed" && data) {
+      setAllSubjects(data);
+      console.log(data);
     }
-  }, [sendRequest, isReload]);
+  }, [data, status]);
   const history = useHistory();
   const [isAddSubjectDialogVisible, setIsAddSubjectDialogVisible] =
     React.useState(false);
   const [isEditSubjectDialogVisible, setIsEditSubjectDialogVisible] =
     React.useState(false);
-  const [idSubject, setIdSubject] = React.useState(1);
+  const [editSubject, setEditSubject] = React.useState(null);
+  const [allSubjects, setAllSubjects] = React.useState([]);
+  const updateSubject = (subject) => {
+    let newSubjects = allSubjects.map((x) =>
+      x.maMH !== subject.maMH ? x : subject
+    );
+    setAllSubjects(newSubjects);
+  };
+  const delSubjects = (Subjects) => {
+    let newSubjects = [...allSubjects];
+    for (let i = 0; i < Subjects.length; i++) {
+      newSubjects = newSubjects.filter((x) => x.maMH !== Subjects[i]);
+    }
+    console.log(newSubjects);
+    setAllSubjects(newSubjects);
+  };
+  const addSubject = (subject) => {
+    let newSubjects = [...allSubjects];
+    newSubjects.push(subject);
+    setAllSubjects(newSubjects);
+  };
   const showAddSubjectHandler = () => {
     setIsAddSubjectDialogVisible(true);
   };
   const hideAddSubjectHandler = () => {
     setIsAddSubjectDialogVisible(false);
   };
-  const showEditSubjectHandler = (id) => {
-    setIdSubject(id);
+  const showEditSubjectHandler = (subject) => {
+    setEditSubject(subject);
     setIsEditSubjectDialogVisible(true);
   };
   const hideEditSubjectHandler = () => {
@@ -87,28 +109,28 @@ const SubjectsList = () => {
         }}
       >
         <Grid item xs={12}>
-          <SubjectsTable onShowEdit={showEditSubjectHandler} data={data} />
+          <SubjectsTable
+            onShowEdit={showEditSubjectHandler}
+            data={allSubjects}
+            delSubjects={delSubjects}
+          />
         </Grid>
       </Grid>
 
       {isAddSubjectDialogVisible && (
         <AddSubjectForm
           open={isAddSubjectDialogVisible}
+          addSubject={addSubject}
           onClose={hideAddSubjectHandler}
-          onReload={() => {
-            setIsReload(true);
-          }}
         />
       )}
 
       {isEditSubjectDialogVisible && (
         <EditSubjectForm
-          maMH={idSubject}
+          updateSubjects={updateSubject}
+          editSubject={editSubject}
           open={isEditSubjectDialogVisible}
           onClose={hideEditSubjectHandler}
-          onReload={() => {
-            setIsReload(true);
-          }}
         />
       )}
     </>

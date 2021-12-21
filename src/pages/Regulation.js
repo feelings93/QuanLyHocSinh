@@ -12,58 +12,68 @@ import Rank from "../components/rules/rank";
 import Age from "../components/rules/age";
 import Button from "@mui/material/Button";
 import SaveIcon from "@mui/icons-material/SaveAltOutlined";
+import useHttp from "../hooks/use-http";
+import { getAllParams, editParams } from "../lib/api";
+import Loading from "../components/UI/Loading";
+import swal from "sweetalert";
 
-const Table_ThamSo = [
-  {
-    id: 1,
-    name: "maxClass",
-    value: 30,
-  },
-  {
-    id: 2,
-    name: "minStudent",
-    value: "20",
-  },
-  {
-    id: 3,
-    name: "maxStudent",
-    value: "50",
-  },
-  {
-    id: 4,
-    name: "maxSubject",
-    value: "90",
-  },
-  {
-    id: 5,
-    name: "maxDiemChuan",
-    value: 8,
-  },
-  {
-    id: 6,
-    name: "maxAge",
-    value: 20,
-  },
-  {
-    id: 7,
-    name: "minAge",
-    value: 15,
-  },
-];
 const Regulation = () => {
+  const { sendRequest, data, status, error } = useHttp(getAllParams, true);
+  const {
+    sendRequest: suaThamSo,
+    data: dataEdit,
+    status: statusEdit,
+    error: errorEdit,
+  } = useHttp(editParams);
+  const [isReload, setIsReload] = React.useState(true);
+  React.useEffect(() => {
+    if (isReload === true) {
+      sendRequest();
+      setIsReload(false);
+    }
+  }, [sendRequest, isReload]);
   const [value, setValue] = React.useState("qua");
 
   const [edit, setEdit] = React.useState(false);
   const handleChange = (event, newValue) => {
     //alert( (Table_Quanity.find((e) => e.name==="maxClass" )).value);
     setValue(newValue);
+    setThamSo([]);
   };
 
+  const [thamSo, setThamSo] = React.useState([]);
+  const thamSoHandler = (params) => {
+    setThamSo((prev) => {
+      if (!params) return [];
+      if (prev.length === 0) return [params];
+      const newState = [...prev];
+      let t = newState.find((e) => e.maTS === params.maTS);
+      if (!t) newState.push(params);
+      else t.giaTri = params.giaTri;
+      return newState;
+    });
+  };
+  const editParamsHandler = () => {
+    suaThamSo(thamSo);
+  };
+  React.useEffect(() => {
+    if (statusEdit === "completed") {
+      if (dataEdit) {
+        setIsReload(true);
+        setEdit(false);
+        swal(
+          "Cập nhật thành công!",
+          "Bạn đã cập nhật tham số thành công",
+          "success"
+        );
+      } else if (errorEdit) swal("Đã có lỗi xảy ra", errorEdit, "error");
+    }
+  }, [dataEdit, errorEdit, statusEdit]);
+  if (status === "pending") return <Loading />;
+  if (error) return <p>{error}</p>;
   return (
     <Grid
       container
-      sm={12}
-      xs={12}
       alignItems="center"
       justifyContent="center"
       direction="column"
@@ -100,7 +110,6 @@ const Regulation = () => {
             }}
           >
             <TabList
-              TabList
               onChange={handleChange}
               aria-label="lab API tabs example"
               centered
@@ -123,17 +132,12 @@ const Regulation = () => {
               }}
             >
               <Quanity
+                onTSChange={thamSoHandler}
                 setDis={edit}
-                maxClass={Table_ThamSo.find((e) => e.name === "maxClass").value}
-                maxStudent={
-                  Table_ThamSo.find((e) => e.name === "maxStudent").value
-                }
-                minStudent={
-                  Table_ThamSo.find((e) => e.name === "minStudent").value
-                }
-                maxSubject={
-                  Table_ThamSo.find((e) => e.name === "maxSubject").value
-                }
+                maxClass={data.find((e) => e.maTS === 1).giaTri}
+                maxStudent={data.find((e) => e.maTS === 3).giaTri}
+                minStudent={data.find((e) => e.maTS === 2).giaTri}
+                maxSubject={data.find((e) => e.maTS === 4).giaTri}
               ></Quanity>
             </Box>
           </TabPanel>
@@ -149,10 +153,9 @@ const Regulation = () => {
               }}
             >
               <Rank
+                onTSChange={thamSoHandler}
                 setDis={edit}
-                maxDiemChuan={
-                  Table_ThamSo.find((e) => e.name === "maxDiemChuan").value
-                }
+                maxDiemChuan={data.find((e) => e.maTS === 5).giaTri}
               ></Rank>
             </Box>
           </TabPanel>
@@ -168,26 +171,25 @@ const Regulation = () => {
               }}
             >
               <Age
+                onTSChange={thamSoHandler}
                 setDis={edit}
-                maxAge={Table_ThamSo.find((e) => e.name === "maxAge").value}
-                minAge={Table_ThamSo.find((e) => e.name === "minAge").value}
+                maxAge={data.find((e) => e.maTS === 7).giaTri}
+                minAge={data.find((e) => e.maTS === 6).giaTri}
               ></Age>
             </Box>
           </TabPanel>
         </TabContext>
       </Grid>
-      <Grid sm={12} xs={8}>
+      <Grid item sm={12} xs={8}>
         <Button
           style={{ display: edit ? "" : "none" }}
           variant="contained"
           size="Large"
           endIcon={<SaveIcon />}
-          disabled={!edit}
-          onClick={() => {
-            setEdit(!edit);
-          }}
+          disabled={statusEdit === "pending"}
+          onClick={editParamsHandler}
         >
-          Lưu lại
+          {statusEdit === "pending" ? "Đang lưu ..." : "Lưu lại"}
         </Button>
       </Grid>
     </Grid>
