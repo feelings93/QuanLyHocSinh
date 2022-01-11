@@ -2,7 +2,7 @@ import axios from "axios";
 import moment from "moment";
 // const FIREBASE_DOMAIN = "https://practice-e56ad-default-rtdb.firebaseio.com";
 
-const BACKEND_DOMAIN = "http://localhost:8000";
+const BACKEND_DOMAIN = "https://secret-sands-10044.herokuapp.com/";
 // const BACKEND_DOMAIN = "";
 const toStr = (arr) => {
   let res = "";
